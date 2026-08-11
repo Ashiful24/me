@@ -1,5 +1,12 @@
-import Image from "next/image";
+import Link from "next/link";
 import type { IconType } from "react-icons";
+import AnimatedSection from "@/components/AnimatedSection";
+import DeveloperProfile from "@/components/DeveloperProfile";
+import DevSectionLabel from "@/components/DevSectionLabel";
+import Footer from "@/components/Footer";
+import FloatingMenu from "@/components/FloatingMenu";
+import Navbar from "@/components/Navbar";
+import ProjectCard, { type Project } from "@/components/ProjectCard";
 import {
   FaCogs,
   FaCode,
@@ -130,41 +137,59 @@ const skillGroups = [
 ];
 
 const stats = [
-  { value: "200+", label: "APIs developed" },
-  { value: "40%", label: "Search latency improvement" },
+  { value: "500+", label: "APIs developed" },
+  { value: "6", label: "Production-grade projects" },
   { value: "200+", label: "Problems solved on Beecrowd" },
 ];
 
-const projects = [
+const buildMetric = {
+  value: "40%",
+  label: "search latency improvement",
+};
+
+const linkedInUrl = "https://www.linkedin.com/in/Ashiful-Islam-Istiuk/";
+
+const projects: Project[] = [
   {
+    file: "hotel_ticketing.service.ts",
     title: "Hotel Ticketing System",
     description:
       "Engineered a robust NestJS backend with Prisma ORM, modular architecture, custom guards, interceptors, decorators, JWT based RBAC, 30+ documented APIs, advanced filtering, pagination, and Jest unit testing.",
     tags: ["NestJS", "Prisma", "JWT", "Jest"],
+    github: "https://github.com/Ashiful24/hotel-ticketing-system",
   },
   {
+    file: "ecommerce_api.module.ts",
     title: "E-commerce REST API",
     description:
       "Developed an e-commerce backend focused on relational data integrity, order processing, and maintainable NestJS modules for users, products, categories, and orders.",
     tags: ["NestJS", "Prisma", "REST API"],
+    github: "https://github.com/Ashiful24/E-commers-backend",
   },
   {
+    file: "g_salon.page.tsx",
     title: "G-Salon",
     description:
       "Built and deployed a production-ready salon website with responsive UI, service listings, appointment booking, and performance optimization.",
     tags: ["Next.js", "React", "TypeScript", "Tailwind"],
+    github: "https://github.com/Ashiful24/G-Salon",
+    live: "https://g-saloon.vercel.app",
   },
   {
+    file: "eventify.cs",
     title: "Eventify",
     description:
       "Created an event management platform as a C# console application using OOP principles for venue exploration, organizer management, event creation, ticket issuing, and bookings.",
     tags: ["C#", "OOP", "Console App"],
+    github: "https://github.com/Ashiful24/Eventify",
   },
   {
+    file: "todo_app.dart",
     title: "To Do App",
     description:
       "Implemented a mobile task app with add, complete, and delete flows using Flutter and Hive, focusing on practical productivity and simple UI interactions.",
     tags: ["Flutter", "Hive", "Mobile"],
+    github: "https://github.com/Ashiful24/ToDoApp",
   },
 ];
 
@@ -206,6 +231,27 @@ const highlights = [
   "Resolved critical dashboard issues and helped maintain 99.9% system uptime.",
 ];
 
+const testimonials = [
+  {
+    quote:
+      "Ashiful has been my client for the last 12 years at my salon. Recently, I requested him to create a website for my salon, and he did an amazing job. I'm really happy with the result and truly appreciate his work. Highly recommended!",
+    name: "Gaoranggo Chandra Sill",
+    role: "G-Salon",
+  },
+  {
+    quote:
+      "Add a testimonial about a specific project or strength — reliability, code quality, or problem solving.",
+    name: "Add Name",
+    role: "Add Role, Company",
+  },
+  {
+    quote:
+      "Add feedback from a client or collaborator on a freelance or academic project.",
+    name: "Add Name",
+    role: "Add Role, Company",
+  },
+];
+
 const contactLinks = [
   {
     label: "Email",
@@ -244,96 +290,59 @@ const contactLinks = [
   },
 ];
 
-const marqueeSkills = skillGroups.flatMap((group) => group.items);
-
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#1e1e1e] text-[#d4d4d4]">
-      <section className="relative isolate px-6 py-6 sm:px-10 lg:px-16">
+    <main className="relative min-h-screen bg-[#1e1e1e] text-[#d4d4d4]">
+      <section className="relative z-10 px-6 py-6 sm:px-10 lg:px-16">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(0,122,204,0.24),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(197,134,192,0.14),transparent_30%),linear-gradient(180deg,#252526_0%,#1e1e1e_65%)]" />
         <div className="absolute left-1/2 top-0 -z-10 h-80 w-80 -translate-x-1/2 rounded-full bg-[#007acc]/20 blur-3xl" />
 
-        <nav className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[#3c3c3c] bg-[#252526]/80 px-5 py-4 backdrop-blur">
-          <a href="#home" className="text-sm font-semibold tracking-[0.2em]">
-            K. M. Ashiful Islam Istiuk
-          </a>
-          <div className="hidden items-center gap-8 text-sm text-[#cccccc] md:flex">
-            <a className="transition hover:text-white" href="#experience">
-              Experience
-            </a>
-            <a className="transition hover:text-white" href="#work">
-              Projects
-            </a>
-            <a className="transition hover:text-white" href="#skills">
-              Skills
-            </a>
-            <a className="transition hover:text-white" href="#contact">
-              Contact
-            </a>
+        {/* Hero code watermarks */}
+        <div className="pointer-events-none absolute inset-0 select-none overflow-hidden" aria-hidden="true">
+          <div className="absolute -left-6 top-[8%] rotate-[-12deg] font-mono text-[10rem] font-black leading-none text-[#007acc]/[0.06] sm:text-[14rem]">
+            {"{ }"}
           </div>
-          <a
-            className="rounded-full bg-[#007acc] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#3794ff]"
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=angkon199@gmail.com&su=Portfolio%20Inquiry"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Hire Me
-          </a>
-        </nav>
-
-        <div className="skill-marquee-mask mx-auto mt-5 max-w-7xl overflow-hidden bg-[#252526]/60 py-1.5 backdrop-blur">
-          <div className="skill-marquee-track flex w-max items-center gap-4 px-3">
-            {[...marqueeSkills, ...marqueeSkills].map((skill, index) => {
-              const Icon = skill.icon;
-
-              return (
-                <div
-                  key={`${skill.name}-${index}`}
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#3c3c3c] bg-[#1e1e1e]"
-                  title={skill.name}
-                >
-                  <Icon
-                    aria-hidden="true"
-                    className={`h-5 w-5 ${skill.color}`}
-                  />
-                  <span className="sr-only">{skill.name}</span>
-                </div>
-              );
-            })}
+          <div className="absolute -right-4 top-[5%] rotate-[8deg] font-mono text-[8rem] font-black leading-none text-[#c586c0]/[0.06] sm:text-[11rem]">
+            {"</>"}
+          </div>
+          <div className="absolute left-[5%] top-[55%] space-y-3 font-mono text-[11px] text-[#569cd6]/[0.1] sm:text-xs">
+            <p>const app = createServer();</p>
+            <p>app.use(cors());</p>
+            <p>app.listen(3000);</p>
+          </div>
+          <div className="absolute right-[6%] top-[40%] space-y-3 text-right font-mono text-[11px] text-[#4ec9b0]/[0.09] sm:text-xs">
+            <p>@Controller(&apos;/api&apos;)</p>
+            <p>@Injectable()</p>
+            <p>export class AppService {"{}"}</p>
+          </div>
+          <div className="absolute left-[30%] top-[25%] font-mono text-[5rem] font-black text-[#c586c0]/[0.05]">
+            {"=>"}
+          </div>
+          <div className="absolute right-[20%] top-[70%] font-mono text-[6rem] font-bold text-[#d4d4d4]/[0.04]">;</div>
+          <div className="absolute bottom-[8%] left-[15%] font-mono text-[11px] text-[#ce9178]/[0.08] sm:text-xs">
+            async function deploy(config: Config): Promise&lt;void&gt;
+          </div>
+          <div className="absolute bottom-[20%] right-[10%] font-mono text-[5rem] font-black text-[#569cd6]/[0.05]">
+            {"|>"}
           </div>
         </div>
 
+        <Navbar />
+
         <div
           id="home"
-          className="mx-auto grid max-w-7xl items-center gap-10 pb-20 pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:pb-28 lg:pt-16"
+          className="mx-auto grid max-w-7xl items-start gap-10 pb-20 pt-12 lg:grid-cols-[minmax(0,1fr)_36rem] lg:gap-x-5 lg:pb-28 lg:pt-16"
         >
-          <div>
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#007acc]/30 bg-[#007acc]/10 px-4 py-2 text-sm font-medium text-[#9cdcfe]">
-              <svg
-                aria-hidden="true"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 10.5h.01"
-                />
-              </svg>
-              Dhanmondi, Dhaka, Bangladesh
+          <div className="min-w-0">
+            <p className="mb-2 inline-flex items-center gap-2 rounded-lg border border-[#3c3c3c] bg-[#252526] px-4 py-2 font-mono text-sm text-[#9cdcfe]">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#28c840]" />
+              open_to_work · ~/dhaka/bd
             </p>
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
-              Junior Software
+
+            <h1 className="mt-1 max-w-4xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+              Junior
               <span className="block bg-gradient-to-r from-[#569cd6] via-[#d4d4d4] to-[#c586c0] bg-clip-text text-transparent">
-                Engineer
+                Software Engineer
               </span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[#cccccc]">
@@ -343,83 +352,37 @@ export default function Home() {
               systems, and reliable database driven applications.
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/resume"
+                className="rounded-full bg-[#007acc] px-7 py-4 text-center text-sm font-bold text-white transition hover:bg-[#3794ff]"
+              >
+                View Resume
+              </Link>
               <a
                 href="#experience"
-                className="rounded-full bg-[#007acc] px-7 py-4 text-center text-sm font-bold text-white transition hover:bg-[#3794ff]"
+                className="rounded-full border border-[#3c3c3c] px-7 py-4 text-center text-sm font-bold text-white transition hover:border-[#007acc] hover:bg-[#2d2d30]"
               >
                 View Experience
               </a>
-              <a
-                href="https://www.linkedin.com/in/Ashiful-Islam-Istiuk/"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-[#3c3c3c] px-7 py-4 text-center text-sm font-bold text-white transition hover:border-[#007acc] hover:bg-[#2d2d30]"
-              >
-                LinkedIn Profile
-              </a>
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl">
-            <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-[#007acc]/20 to-[#c586c0]/15 blur-2xl" />
-            <div className="relative rounded-[2.5rem] border border-[#3c3c3c] bg-[#252526]/90 p-5 shadow-2xl backdrop-blur">
-              <div className="rounded-[2rem] border border-[#3c3c3c] bg-[#1e1e1e] p-6">
-                <div>
-                  <p className="text-sm text-white/50">Profile</p>
-                  <h2 className="mt-1 text-2xl font-bold">
-                    K. M. Ashiful Islam Istiuk
-                  </h2>
-                  <p className="mt-2 text-sm text-white/50">
-                    Junior Software Engineer
-                  </p>
-                </div>
-
-                <div className="mt-8 overflow-hidden rounded-[2rem] border border-[#3c3c3c] bg-[#1e1e1e] p-3">
-                  <div className="relative h-80 overflow-hidden rounded-[1.5rem] bg-[#1e1e1e] sm:h-96">
-                    <Image
-                      src="/profile.png"
-                      alt="K. M. Ashiful Islam Istiuk"
-                      fill
-                      priority
-                      className="object-cover object-center"
-                      sizes="(min-width: 1024px) 520px, 100vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e1e]/45 via-transparent to-transparent" />
-                  </div>
-                </div>
-
-                <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                  {stats.map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-3xl border border-[#3c3c3c] bg-[#252526] p-4"
-                    >
-                      <p className="text-2xl font-black text-[#9cdcfe]">
-                        {item.value}
-                      </p>
-                      <p className="mt-2 text-xs leading-5 text-white/55">
-                        {item.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            </div>
-          </div>
+          <DeveloperProfile
+            stats={stats}
+            buildMetric={buildMetric}
+            linkedInUrl={linkedInUrl}
+          />
         </div>
       </section>
 
-      <section id="skills" className="px-6 py-10 sm:px-10 lg:px-16">
+      <AnimatedSection id="skills" className="px-6 py-10 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#9cdcfe]">
-                Skills
-              </p>
-              <h2 className="mt-3 text-3xl font-black sm:text-5xl">
-                Technical stack for full-stack engineering.
-              </h2>
+              <DevSectionLabel
+                label="Technical stack for full-stack engineering."
+                comment="// skills.ts"
+              />
             </div>
             <p className="max-w-xl text-[#cccccc]">
               Experienced across frontend, backend, realtime communication,
@@ -432,7 +395,10 @@ export default function Home() {
                 key={group.title}
                 className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6"
               >
-                <h3 className="text-xl font-bold">{group.title}</h3>
+                <h3 className="font-mono text-sm text-[#569cd6]">
+                  import {"{"} {group.title.toLowerCase().replace(/\s+/g, "_")}{" "}
+                  {"}"} from &apos;./stack&apos;;
+                </h3>
                 <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {group.items.map((skill) => {
                     const Icon = skill.icon;
@@ -457,17 +423,15 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section id="experience" className="px-6 py-16 sm:px-10 lg:px-16">
+      <AnimatedSection id="experience" className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#9cdcfe]">
-              Experience
-            </p>
-            <h2 className="mt-5 text-4xl font-black sm:text-5xl">
-              Building internal products at Bengal Mobile QA Solution.
-            </h2>
+            <DevSectionLabel
+              label="Building internal products at Bengal Mobile QA Solution."
+              comment="// experience.log"
+            />
             <p className="mt-5 leading-8 text-[#cccccc]">
               I contributed to Hope, Shohay, and Otithi by taking end-to-end
               ownership of backend and frontend features in a microservices
@@ -475,107 +439,121 @@ export default function Home() {
             </p>
           </div>
           <div className="grid gap-4">
-            {highlights.map((highlight) => (
+            {highlights.map((highlight, index) => (
               <div
                 key={highlight}
-                className="rounded-[1.5rem] border border-[#3c3c3c] bg-[#252526] p-5 text-[#d4d4d4]"
+                className="rounded-[1.5rem] border border-[#3c3c3c] bg-[#252526] p-5 font-mono text-sm text-[#d4d4d4]"
               >
+                <span className="text-[#6a9955]">
+                  [{String(index + 1).padStart(2, "0")}]
+                </span>{" "}
                 {highlight}
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section id="work" className="px-6 py-16 sm:px-10 lg:px-16">
+      <AnimatedSection id="work" className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#c586c0]">
-            Selected Work
-          </p>
+          <DevSectionLabel
+            label="Selected Work"
+            comment="// projects/"
+          />
           <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            {projects.map((project, index) => (
-              <article
-                key={project.title}
-                className="group rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 transition hover:-translate-y-1 hover:border-[#007acc]/60 hover:bg-[#2d2d30]"
-              >
-                <div className="mb-10 flex h-44 items-end rounded-[1.5rem] bg-gradient-to-br from-[#3c3c3c] to-[#1e1e1e] p-5">
-                  <span className="text-6xl font-black text-white/15">
-                    0{index + 1}
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold">{project.title}</h3>
-                <p className="mt-3 leading-7 text-white/60">
-                  {project.description}
-                </p>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-[#007acc]/15 px-3 py-1 text-xs font-semibold text-[#9cdcfe]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </article>
+            {projects.map((project) => (
+              <ProjectCard key={project.title} project={project} />
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section className="px-6 py-16 sm:px-10 lg:px-16">
+      <AnimatedSection className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="rounded-[2rem] border border-[#007acc]/60 bg-[#007acc] p-8 text-white">
-            <p className="text-sm font-bold uppercase tracking-[0.25em]">
-              Services
-            </p>
-            <h2 className="mt-5 text-4xl font-black">
+            <p className="font-mono text-sm text-white/70">{"// services.ts"}</p>
+            <h2 className="mt-3 text-4xl font-black">
               From API design to realtime user experiences.
             </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <div
                 key={service}
-                className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 text-lg font-semibold text-[#d4d4d4]"
+                className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 font-mono text-sm text-[#d4d4d4]"
               >
-                {service}
+                <span className="text-[#c586c0]">export const</span> service_
+                {String(index + 1).padStart(2, "0")}{" "}
+                <span className="text-[#6a9955]">=</span>{" "}
+                <span className="text-[#ce9178]">&quot;{service}&quot;</span>;
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section className="px-6 py-16 sm:px-10 lg:px-16">
+      <AnimatedSection className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#9cdcfe]">
-            Journey
-          </p>
-          <div className="mt-8 grid gap-4">
+          <DevSectionLabel label="Journey" comment="// git log --oneline" />
+          <div className="relative mt-10 space-y-10 border-l border-[#3c3c3c] pl-8 sm:pl-10">
             {timeline.map((item) => (
+              <div key={item.title} className="relative">
+                <span className="absolute -left-[2.55rem] top-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#007acc] bg-[#1e1e1e] sm:-left-[3.05rem]">
+                  <span className="h-2 w-2 rounded-full bg-[#007acc]" />
+                </span>
+                <p className="font-mono text-xs font-bold text-[#6a9955]">
+                  commit {item.year}
+                </p>
+                <h3 className="mt-1 text-xl font-bold sm:text-2xl">
+                  {item.title}
+                </h3>
+                <p className="mt-2 max-w-3xl leading-7 text-white/60">
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection className="px-6 py-16 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+          <DevSectionLabel
+            label="What people say about working with me."
+            comment="// testimonials.json"
+          />
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {testimonials.map((testimonial) => (
               <div
-                key={item.title}
-                className="grid gap-4 rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 md:grid-cols-[120px_1fr]"
+                key={testimonial.name + testimonial.quote}
+                className="flex h-full flex-col rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6"
               >
-                <p className="text-xl font-black text-[#9cdcfe]">{item.year}</p>
-                <div>
-                  <h3 className="text-2xl font-bold">{item.title}</h3>
-                  <p className="mt-2 leading-7 text-white/60">{item.text}</p>
+                <p className="font-mono text-xs text-[#6a9955]">
+                  {"/* review */"}
+                </p>
+                <p className="mt-3 flex-1 leading-7 text-[#cccccc]">
+                  {testimonial.quote}
+                </p>
+                <div className="mt-5 border-t border-[#3c3c3c] pt-4 font-mono text-xs">
+                  <p className="font-bold text-[#9cdcfe]">
+                    — {testimonial.name}
+                  </p>
+                  <p className="text-[#858585]">{testimonial.role}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section id="contact" className="px-6 py-16 sm:px-10 lg:px-16">
+      <AnimatedSection id="contact" className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl rounded-[2.5rem] border border-[#3c3c3c] bg-[#252526] p-8 text-center sm:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#c586c0]">
-            Contact
-          </p>
-          <h2 className="mt-5 text-4xl font-black sm:text-6xl">
-            Let&apos;s build something great.
-          </h2>
+          <div className="flex justify-center">
+            <DevSectionLabel
+              label="Let's build something great."
+              comment="// contact.ts → send()"
+            />
+          </div>
           <p className="mx-auto mt-5 max-w-2xl leading-8 text-[#cccccc]">
             Open to junior software engineering roles, full-stack product work,
             backend systems, and modern frontend development.
@@ -605,7 +583,10 @@ export default function Home() {
             })}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
+
+      <Footer />
+      <FloatingMenu />
     </main>
   );
 }
