@@ -1,21 +1,307 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Portfolio Prisma schema — every content table FKs User via userId (no profileId)
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  password    String
+  username    String     @unique
+  phoneNumber String?
+  role        Role       @default(ADMIN)
+  status      UserStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  createdByUser User?  @relation("UserCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?  @relation("UserUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  createdUsers  User[] @relation("UserCreatedBy")
+  updatedUsers  User[] @relation("UserUpdatedBy")
+
+  profiles              Profile[]
+  stats                 Stat[]
+  projects              Project[]
+  projectTags           ProjectTag[]
+  projectCredentials    ProjectCredential[]
+  experiences           Experience[]
+  services              Service[]
+  experienceHighlights  ExperienceHighlight[]
+  timelineEntries       TimelineEntry[]
+  testimonials          Testimonial[]
+  contactLinks          ContactLink[]
+  skillGroups           SkillGroup[]
+  skills                Skill[]
+  skillDetails          SkillDetail[]
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  name            String
+  title           String
+  bio             String   @db.Text
+  location        String
+  status          String
+  avatarUrl       String
+  linkedInUrl     String
+  resumeUrl       String
+  siteUrl         String
+  siteTitle       String
+  siteDescription String   @db.Text
+  roles           String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  updatedBy       String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Stat {
   id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
+  userId    String
+  value     String
+  label     String
+  sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  userId      String
+  file        String
+  title       String
+  description String   @db.Text
+  github      String?
+  live        String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags        ProjectTag[]
+  credentials ProjectCredential[]
+
+  @@index([userId])
+}
+
+model ProjectTag {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+model ProjectCredential {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  label     String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+model Experience {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  subtitle  String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  highlights ExperienceHighlight[]
+
+  @@index([userId])
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  userId      String
+  description String   @db.Text
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ExperienceHighlight {
+  id           String   @id @default(cuid())
+  userId       String
+  experienceId String
+  text         String   @db.Text
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([experienceId])
+}
+
+model TimelineEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  year      String
+  title     String
+  text      String   @db.Text
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  userId    String
+  quote     String   @db.Text
+  name      String
+  role      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ContactLink {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String
+  value     String
+  href      String
+  iconKey   String
+  color     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SkillGroup {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills Skill[]
+
+  @@index([userId])
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  userId    String
+  parentId  String
+  title     String
+  iconKey   String
+  color     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent SkillGroup   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  detail SkillDetail?
+
+  @@index([userId])
+  @@index([parentId])
+}
+
+model SkillDetail {
+  id         String   @id @default(cuid())
+  userId     String
+  skillId    String   @unique
+  knowledge  String   @db.Text
+  experience String   @db.Text
+  stats      String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String?
+  updatedBy  String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

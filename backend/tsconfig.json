@@ -16,9 +16,16 @@
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "baseUrl": ".",
+    "paths": {
+      "@prisma/client": ["./node_modules/.prisma/client/index"]
+    }
+  },
+  "include": ["src/**/*", "prisma/seed.ts", "test/**/*"],
+  "exclude": ["node_modules", "dist", "generated"]
 }
