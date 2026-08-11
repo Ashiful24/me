@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { IconType } from "react-icons";
 import AnimatedSection from "@/components/AnimatedSection";
 import DeveloperProfile from "@/components/DeveloperProfile";
 import DevSectionLabel from "@/components/DevSectionLabel";
@@ -7,134 +6,16 @@ import Footer from "@/components/Footer";
 import FloatingMenu from "@/components/FloatingMenu";
 import Navbar from "@/components/Navbar";
 import ProjectCard, { type Project } from "@/components/ProjectCard";
+import SkillsGrid from "@/components/SkillsGrid";
 import {
-  FaCogs,
   FaCode,
-  FaDatabase,
-  FaLayerGroup,
   FaLinkedinIn,
-  FaNetworkWired,
   FaPhoneAlt,
-  FaPlug,
-  FaProjectDiagram,
-  FaUsersCog,
 } from "react-icons/fa";
 import {
-  SiAngular,
-  SiApachecassandra,
-  SiBitbucket,
-  SiC,
-  SiCss,
-  SiDevexpress,
-  SiDocker,
-  SiDrizzle,
-  SiExpress,
-  SiGit,
   SiGithub,
   SiGmail,
-  SiHtml5,
-  SiJavascript,
-  SiMui,
-  SiNestjs,
-  SiNextdotjs,
-  SiNodedotjs,
-  SiPostgresql,
-  SiPostman,
-  SiPrimeng,
-  SiPrisma,
-  SiReactivex,
-  SiReact,
-  SiRedis,
-  SiSharp,
-  SiSocketdotio,
-  SiSwagger,
-  SiTypescript,
 } from "react-icons/si";
-
-type Skill = {
-  name: string;
-  icon: IconType;
-  color: string;
-};
-
-const skillGroups = [
-  {
-    title: "Languages",
-    items: [
-      { name: "TypeScript", icon: SiTypescript, color: "text-[#3178c6]" },
-      { name: "JavaScript", icon: SiJavascript, color: "text-[#f7df1e]" },
-      { name: "C", icon: SiC, color: "text-[#a8b9cc]" },
-      { name: "C#", icon: SiSharp, color: "text-[#9b4f96]" },
-    ] satisfies Skill[],
-  },
-  {
-    title: "Frontend",
-    items: [
-      { name: "React.js", icon: SiReact, color: "text-[#61dafb]" },
-      { name: "Next.js", icon: SiNextdotjs, color: "text-white" },
-      { name: "Angular", icon: SiAngular, color: "text-[#dd0031]" },
-      { name: "RxJS", icon: SiReactivex, color: "text-[#b7178c]" },
-      { name: "Material UI", icon: SiMui, color: "text-[#007fff]" },
-      { name: "DevExtreme", icon: SiDevexpress, color: "text-[#ff7200]" },
-      { name: "PrimeNG", icon: SiPrimeng, color: "text-[#dd0031]" },
-      { name: "HTML5", icon: SiHtml5, color: "text-[#e34f26]" },
-      { name: "CSS3", icon: SiCss, color: "text-[#663399]" },
-    ] satisfies Skill[],
-  },
-  {
-    title: "Backend",
-    items: [
-      { name: "Node.js", icon: SiNodedotjs, color: "text-[#5fa04e]" },
-      { name: "NestJS", icon: SiNestjs, color: "text-[#e0234e]" },
-      { name: "Express.js", icon: SiExpress, color: "text-white" },
-      { name: "REST APIs", icon: FaPlug, color: "text-[#9cdcfe]" },
-      { name: "Prisma ORM", icon: SiPrisma, color: "text-[#2d3748]" },
-      { name: "Drizzle ORM", icon: SiDrizzle, color: "text-[#c5f74f]" },
-    ] satisfies Skill[],
-  },
-  {
-    title: "Realtime & Database",
-    items: [
-      { name: "Redis", icon: SiRedis, color: "text-[#ff4438]" },
-      { name: "WebSocket", icon: FaNetworkWired, color: "text-[#9cdcfe]" },
-      { name: "Socket.IO", icon: SiSocketdotio, color: "text-white" },
-      {
-        name: "Cassandra",
-        icon: SiApachecassandra,
-        color: "text-[#1287b1]",
-      },
-      { name: "PostgreSQL", icon: SiPostgresql, color: "text-[#4169e1]" },
-      {
-        name: "Session Management",
-        icon: FaUsersCog,
-        color: "text-[#c586c0]",
-      },
-    ] satisfies Skill[],
-  },
-  {
-    title: "Tools & Practices",
-    items: [
-      { name: "Git", icon: SiGit, color: "text-[#f05032]" },
-      { name: "GitHub", icon: SiGithub, color: "text-white" },
-      { name: "Bitbucket", icon: SiBitbucket, color: "text-[#0052cc]" },
-      { name: "Docker", icon: SiDocker, color: "text-[#2496ed]" },
-      { name: "Postman", icon: SiPostman, color: "text-[#ff6c37]" },
-      { name: "Swagger", icon: SiSwagger, color: "text-[#85ea2d]" },
-      { name: "TablePlus", icon: FaDatabase, color: "text-amber-200" },
-      {
-        name: "Agile/Scrum",
-        icon: FaProjectDiagram,
-        color: "text-[#9cdcfe]",
-      },
-      {
-        name: "Microservices",
-        icon: FaLayerGroup,
-        color: "text-[#c586c0]",
-      },
-      { name: "SOLID", icon: FaCogs, color: "text-[#9cdcfe]" },
-    ] satisfies Skill[],
-  },
-];
 
 const stats = [
   { value: "500+", label: "APIs developed" },
@@ -389,39 +270,7 @@ export default function Home() {
               databases, DevOps tools, and clean engineering practices.
             </p>
           </div>
-          <div className="mt-10 grid gap-5">
-            {skillGroups.map((group) => (
-              <div
-                key={group.title}
-                className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6"
-              >
-                <h3 className="font-mono text-sm text-[#569cd6]">
-                  import {"{"} {group.title.toLowerCase().replace(/\s+/g, "_")}{" "}
-                  {"}"} from &apos;./stack&apos;;
-                </h3>
-                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                  {group.items.map((skill) => {
-                    const Icon = skill.icon;
-
-                    return (
-                      <div
-                        key={skill.name}
-                        className="group flex min-h-28 flex-col items-center justify-center rounded-3xl border border-[#3c3c3c] bg-[#1e1e1e] p-4 text-center transition hover:-translate-y-1 hover:border-[#007acc]/60 hover:bg-[#2d2d30]"
-                      >
-                        <Icon
-                          aria-hidden="true"
-                          className={`h-9 w-9 transition group-hover:scale-110 ${skill.color}`}
-                        />
-                        <span className="mt-4 text-sm font-semibold text-white/80">
-                          {skill.name}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <SkillsGrid />
         </div>
       </AnimatedSection>
 
