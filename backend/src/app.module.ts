@@ -19,6 +19,7 @@ import { ContactLinksModule } from './contact-links/contact-links.module';
 import { SkillGroupsModule } from './skill-groups/skill-groups.module';
 import { SkillsModule } from './skills/skills.module';
 import { SkillDetailsModule } from './skill-details/skill-details.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { SkillDetailsModule } from './skill-details/skill-details.module';
     SkillGroupsModule,
     SkillsModule,
     SkillDetailsModule,
+    PortfolioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -28,6 +28,7 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag('health', 'API health checks')
     .addTag('auth', 'Login, JWT refresh, and password reset')
+    .addTag('portfolio', 'Public read-only portfolio payload')
     .addTag('users', 'Admin user accounts')
     .addTag('profiles', 'Public portfolio profile')
     .addTag('stats', 'Profile stats cards')

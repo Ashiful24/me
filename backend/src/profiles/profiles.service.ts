@@ -6,6 +6,13 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 export class ProfilesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll(userId?: string) {
+    return this.prisma.profile.findMany({
+      where: userId ? { userId } : undefined,
+      orderBy: { updatedAt: 'desc' },
+    });
+  }
+
   async findOne(id: string) {
     const item = await this.prisma.profile.findUnique({
       where: { id },

@@ -32,6 +32,9 @@ export default function Navbar() {
           <Link className="transition hover:text-white" href="/resume">
             Resume
           </Link>
+          <Link className="transition hover:text-white" href="/admin">
+            Admin
+          </Link>
         </div>
 
         <a

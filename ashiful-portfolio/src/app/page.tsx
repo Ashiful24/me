@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { IconType } from "react-icons";
 import AnimatedSection from "@/components/AnimatedSection";
 import DeveloperProfile from "@/components/DeveloperProfile";
 import DevSectionLabel from "@/components/DevSectionLabel";
@@ -7,30 +8,25 @@ import FloatingMenu from "@/components/FloatingMenu";
 import Navbar from "@/components/Navbar";
 import ProjectCard, { type Project } from "@/components/ProjectCard";
 import SkillsGrid from "@/components/SkillsGrid";
-import {
-  FaCode,
-  FaLinkedinIn,
-  FaPhoneAlt,
-} from "react-icons/fa";
-import {
-  SiGithub,
-  SiGmail,
-} from "react-icons/si";
+import { FaCode, FaLinkedinIn, FaPhoneAlt } from "react-icons/fa";
+import { SiGithub, SiGmail } from "react-icons/si";
+import { fetchPortfolio, mapProjects } from "@/lib/portfolio";
 
-const stats = [
+const fallbackStats = [
   { value: "500+", label: "APIs developed" },
   { value: "6", label: "Production-grade projects" },
   { value: "200+", label: "Problems solved on Beecrowd" },
 ];
 
-const buildMetric = {
+const fallbackBuildMetric = {
   value: "40%",
   label: "search latency improvement",
 };
 
-const linkedInUrl = "https://www.linkedin.com/in/Ashiful-Islam-Istiuk/";
+const fallbackLinkedIn =
+  "https://www.linkedin.com/in/Ashiful-Islam-Istiuk/";
 
-const projects: Project[] = [
+const fallbackProjects: Project[] = [
   {
     file: "hotel_ticketing.service.ts",
     title: "Hotel Ticketing System",
@@ -74,14 +70,14 @@ const projects: Project[] = [
   },
 ];
 
-const services = [
+const fallbackServices = [
   "Full-stack application development with Next.js, React, Node.js, and NestJS",
   "REST API design, Swagger documentation, and scalable backend modules",
   "Realtime features using WebSocket, Socket.IO, Redis, and presence systems",
   "Responsive dashboards and frontend interfaces with Angular, React, and PrimeNG",
 ];
 
-const timeline = [
+const fallbackTimeline = [
   {
     year: "Jul 2025 - Present",
     title: "Junior Software Engineer, Bengal Mobile QA Solution",
@@ -104,7 +100,7 @@ const timeline = [
   },
 ];
 
-const highlights = [
+const fallbackHighlights = [
   "Architected multi-tenancy features for Shohay Enterprise to support scalable corporate client onboarding.",
   "Integrated Elasticsearch into the Corporate Pledging Flow, improving data retrieval latency by 40%.",
   "Delivered NGO Profile and Hotel/Property modules from database design to frontend implementation.",
@@ -112,7 +108,7 @@ const highlights = [
   "Resolved critical dashboard issues and helped maintain 99.9% system uptime.",
 ];
 
-const testimonials = [
+const fallbackTestimonials = [
   {
     quote:
       "Ashiful has been my client for the last 12 years at my salon. Recently, I requested him to create a website for my salon, and he did an amazing job. I'm really happy with the result and truly appreciate his work. Highly recommended!",
@@ -133,7 +129,15 @@ const testimonials = [
   },
 ];
 
-const contactLinks = [
+const iconMap: Record<string, IconType> = {
+  SiGmail,
+  FaPhoneAlt,
+  FaLinkedinIn,
+  SiGithub,
+  FaCode,
+};
+
+const fallbackContactLinks = [
   {
     label: "Email",
     value: "angkon199@gmail.com\nashiful35-3017@diu.edu.bd",
@@ -171,40 +175,69 @@ const contactLinks = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const portfolio = await fetchPortfolio();
+
+  const stats =
+    portfolio?.stats?.length && portfolio.stats.length >= 3
+      ? portfolio.stats.slice(0, 3)
+      : fallbackStats;
+
+  const buildMetric =
+    portfolio?.stats && portfolio.stats.length > 3
+      ? {
+          value: portfolio.stats[3].value,
+          label: portfolio.stats[3].label,
+        }
+      : fallbackBuildMetric;
+
+  const linkedInUrl = portfolio?.profile?.linkedInUrl || fallbackLinkedIn;
+  const projects = portfolio?.projects?.length
+    ? mapProjects(portfolio.projects)
+    : fallbackProjects;
+  const services = portfolio?.services?.length
+    ? portfolio.services.map((s) => s.description)
+    : fallbackServices;
+  const timeline = portfolio?.timelineEntries?.length
+    ? portfolio.timelineEntries
+    : fallbackTimeline;
+  const highlights =
+    portfolio?.experiences?.[0]?.highlights?.length
+      ? portfolio.experiences[0].highlights.map((h) => h.text)
+      : fallbackHighlights;
+  const testimonials = portfolio?.testimonials?.length
+    ? portfolio.testimonials
+    : fallbackTestimonials;
+  const contactLinks = portfolio?.contactLinks?.length
+    ? portfolio.contactLinks.map((link) => ({
+        label: link.label,
+        value: link.value,
+        href: link.href,
+        icon: iconMap[link.iconKey] ?? FaCode,
+        color: link.color,
+      }))
+    : fallbackContactLinks;
+
+  const heroBio = portfolio?.profile?.bio;
+  const heroTitle = portfolio?.profile?.title || "Junior Software Engineer";
+  const statusLabel = portfolio?.profile?.status || "open_to_work";
+  const locationLabel = portfolio?.profile?.location || "~/dhaka/bd";
+
   return (
     <main className="relative min-h-screen bg-[#1e1e1e] text-[#d4d4d4]">
       <section className="relative z-10 px-6 py-6 sm:px-10 lg:px-16">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(0,122,204,0.24),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(197,134,192,0.14),transparent_30%),linear-gradient(180deg,#252526_0%,#1e1e1e_65%)]" />
         <div className="absolute left-1/2 top-0 -z-10 h-80 w-80 -translate-x-1/2 rounded-full bg-[#007acc]/20 blur-3xl" />
 
-        {/* Hero code watermarks */}
-        <div className="pointer-events-none absolute inset-0 select-none overflow-hidden" aria-hidden="true">
+        <div
+          className="pointer-events-none absolute inset-0 select-none overflow-hidden"
+          aria-hidden="true"
+        >
           <div className="absolute -left-6 top-[8%] rotate-[-12deg] font-mono text-[10rem] font-black leading-none text-[#007acc]/[0.06] sm:text-[14rem]">
             {"{ }"}
           </div>
           <div className="absolute -right-4 top-[5%] rotate-[8deg] font-mono text-[8rem] font-black leading-none text-[#c586c0]/[0.06] sm:text-[11rem]">
             {"</>"}
-          </div>
-          <div className="absolute left-[5%] top-[55%] space-y-3 font-mono text-[11px] text-[#569cd6]/[0.1] sm:text-xs">
-            <p>const app = createServer();</p>
-            <p>app.use(cors());</p>
-            <p>app.listen(3000);</p>
-          </div>
-          <div className="absolute right-[6%] top-[40%] space-y-3 text-right font-mono text-[11px] text-[#4ec9b0]/[0.09] sm:text-xs">
-            <p>@Controller(&apos;/api&apos;)</p>
-            <p>@Injectable()</p>
-            <p>export class AppService {"{}"}</p>
-          </div>
-          <div className="absolute left-[30%] top-[25%] font-mono text-[5rem] font-black text-[#c586c0]/[0.05]">
-            {"=>"}
-          </div>
-          <div className="absolute right-[20%] top-[70%] font-mono text-[6rem] font-bold text-[#d4d4d4]/[0.04]">;</div>
-          <div className="absolute bottom-[8%] left-[15%] font-mono text-[11px] text-[#ce9178]/[0.08] sm:text-xs">
-            async function deploy(config: Config): Promise&lt;void&gt;
-          </div>
-          <div className="absolute bottom-[20%] right-[10%] font-mono text-[5rem] font-black text-[#569cd6]/[0.05]">
-            {"|>"}
           </div>
         </div>
 
@@ -217,20 +250,18 @@ export default function Home() {
           <div className="min-w-0">
             <p className="mb-2 inline-flex items-center gap-2 rounded-lg border border-[#3c3c3c] bg-[#252526] px-4 py-2 font-mono text-sm text-[#9cdcfe]">
               <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#28c840]" />
-              open_to_work · ~/dhaka/bd
+              {statusLabel} · {locationLabel}
             </p>
 
             <h1 className="mt-1 max-w-4xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Junior
+              {heroTitle.split(" ").slice(0, 1).join(" ") || "Junior"}
               <span className="block bg-gradient-to-r from-[#569cd6] via-[#d4d4d4] to-[#c586c0] bg-clip-text text-transparent">
-                Software Engineer
+                {heroTitle.split(" ").slice(1).join(" ") || "Software Engineer"}
               </span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[#cccccc]">
-              I am K. M. Ashiful Islam Istiuk, a software engineer building
-              scalable full-stack applications with TypeScript, Node.js, NestJS,
-              React, and Next.js. I work on REST APIs, microservices, realtime
-              systems, and reliable database driven applications.
+              {heroBio ||
+                "I am K. M. Ashiful Islam Istiuk, a software engineer building scalable full-stack applications with TypeScript, Node.js, NestJS, React, and Next.js. I work on REST APIs, microservices, realtime systems, and reliable database driven applications."}
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <Link
@@ -290,7 +321,7 @@ export default function Home() {
           <div className="grid gap-4">
             {highlights.map((highlight, index) => (
               <div
-                key={highlight}
+                key={`${index}-${highlight.slice(0, 24)}`}
                 className="rounded-[1.5rem] border border-[#3c3c3c] bg-[#252526] p-5 font-mono text-sm text-[#d4d4d4]"
               >
                 <span className="text-[#6a9955]">
@@ -305,10 +336,7 @@ export default function Home() {
 
       <AnimatedSection id="work" className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
-          <DevSectionLabel
-            label="Selected Work"
-            comment="// projects/"
-          />
+          <DevSectionLabel label="Selected Work" comment="// projects/" />
           <div className="mt-6 grid gap-5 lg:grid-cols-3">
             {projects.map((project) => (
               <ProjectCard key={project.title} project={project} />
@@ -328,7 +356,7 @@ export default function Home() {
           <div className="grid gap-4 md:grid-cols-2">
             {services.map((service, index) => (
               <div
-                key={service}
+                key={`${index}-${service.slice(0, 24)}`}
                 className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 font-mono text-sm text-[#d4d4d4]"
               >
                 <span className="text-[#c586c0]">export const</span> service_
@@ -421,7 +449,10 @@ export default function Home() {
                   rel={link.href.startsWith("http") ? "noreferrer" : undefined}
                 >
                   <span className="grid h-12 w-12 place-items-center rounded-2xl border border-[#3c3c3c] bg-[#252526]">
-                    <Icon aria-hidden="true" className={`h-6 w-6 ${link.color}`} />
+                    <Icon
+                      aria-hidden="true"
+                      className={`h-6 w-6 ${link.color}`}
+                    />
                   </span>
                   <span className="sr-only">{link.label}</span>
                   <span className="block min-w-0 whitespace-pre-line break-words text-sm font-semibold text-white">
