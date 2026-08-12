@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StatsService } from './stats.service';
 import { CreateStatDto } from './dto/create-stat.dto';
 import { UpdateStatDto } from './dto/update-stat.dto';
 
 @ApiTags('stats')
+@ApiBearerAuth()
 @Controller('stats')
 export class StatsController {
   constructor(private readonly service: StatsService) {}

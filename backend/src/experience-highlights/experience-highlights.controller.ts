@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ExperienceHighlightsService } from './experience-highlights.service';
 import { CreateExperienceHighlightDto } from './dto/create-experience-highlight.dto';
 import { UpdateExperienceHighlightDto } from './dto/update-experience-highlight.dto';
 
 @ApiTags('experience-highlights')
+@ApiBearerAuth()
 @Controller('experience-highlights')
 export class ExperienceHighlightsController {
   constructor(private readonly service: ExperienceHighlightsService) {}

@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ContactLinksService } from './contact-links.service';
 import { CreateContactLinkDto } from './dto/create-contact-link.dto';
 import { UpdateContactLinkDto } from './dto/update-contact-link.dto';
 
 @ApiTags('contact-links')
+@ApiBearerAuth()
 @Controller('contact-links')
 export class ContactLinksController {
   constructor(private readonly service: ContactLinksService) {}

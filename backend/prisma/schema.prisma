@@ -22,7 +22,7 @@ model User {
   email       String     @unique
   password    String
   username    String     @unique
-  phoneNumber String?
+  phoneNumber String?    @unique
   role        Role       @default(ADMIN)
   status      UserStatus @default(ACTIVE)
   createdAt   DateTime   @default(now())
@@ -49,6 +49,34 @@ model User {
   skillGroups           SkillGroup[]
   skills                Skill[]
   skillDetails          SkillDetail[]
+  refreshTokens         RefreshToken[]
+  passwordResetCodes    PasswordResetCode[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model PasswordResetCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Profile {

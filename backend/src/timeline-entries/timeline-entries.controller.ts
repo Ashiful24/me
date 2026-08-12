@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TimelineEntriesService } from './timeline-entries.service';
 import { CreateTimelineEntryDto } from './dto/create-timeline-entry.dto';
 import { UpdateTimelineEntryDto } from './dto/update-timeline-entry.dto';
 
 @ApiTags('timeline-entries')
+@ApiBearerAuth()
 @Controller('timeline-entries')
 export class TimelineEntriesController {
   constructor(private readonly service: TimelineEntriesService) {}

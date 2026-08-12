@@ -25,7 +25,9 @@ async function bootstrap() {
       'CRUD APIs for the personal portfolio (profile, projects, skills, experience, and more). Use these endpoints to manage seeded website content.',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag('health', 'API health checks')
+    .addTag('auth', 'Login, JWT refresh, and password reset')
     .addTag('users', 'Admin user accounts')
     .addTag('profiles', 'Public portfolio profile')
     .addTag('stats', 'Profile stats cards')

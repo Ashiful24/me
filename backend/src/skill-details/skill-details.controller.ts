@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkillDetailsService } from './skill-details.service';
 import { CreateSkillDetailDto } from './dto/create-skill-detail.dto';
 import { UpdateSkillDetailDto } from './dto/update-skill-detail.dto';
 
 @ApiTags('skill-details')
+@ApiBearerAuth()
 @Controller('skill-details')
 export class SkillDetailsController {
   constructor(private readonly service: SkillDetailsService) {}

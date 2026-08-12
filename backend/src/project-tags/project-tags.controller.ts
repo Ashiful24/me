@@ -8,12 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ProjectTagsService } from './project-tags.service';
 import { CreateProjectTagDto } from './dto/create-project-tag.dto';
 import { UpdateProjectTagDto } from './dto/update-project-tag.dto';
 
 @ApiTags('project-tags')
+@ApiBearerAuth()
 @Controller('project-tags')
 export class ProjectTagsController {
   constructor(private readonly service: ProjectTagsService) {}
