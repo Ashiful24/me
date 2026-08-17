@@ -22,19 +22,19 @@ export default function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-[var(--admin-overlay-strong)]"
         onClick={onCancel}
         aria-hidden
       />
-      <div className="relative w-full max-w-md rounded-lg border border-[#3c3c3c] bg-[#252526] p-5 shadow-xl">
-        <h3 className="text-lg font-semibold text-[#9cdcfe]">{title}</h3>
-        <p className="mt-2 text-sm text-[#cccccc]">{message}</p>
+      <div className="relative w-full max-w-md rounded-lg border border-[var(--admin-border)] bg-[var(--admin-panel)] p-5 shadow-xl">
+        <h3 className="text-lg font-semibold text-[var(--admin-accent)]">{title}</h3>
+        <p className="mt-2 text-sm text-[var(--admin-text)]">{message}</p>
         <div className="mt-5 flex justify-end gap-2">
           <button
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="rounded bg-[#3c3c3c] px-4 py-2 text-sm hover:bg-[#4e4e4e] disabled:opacity-60"
+            className="rounded bg-[var(--admin-secondary)] px-4 py-2 text-sm hover:bg-[var(--admin-hover-strong)] disabled:opacity-60"
           >
             Cancel
           </button>
@@ -42,7 +42,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="rounded bg-[#c42b1c] px-4 py-2 text-sm text-white hover:bg-[#e81123] disabled:opacity-60"
+            className="rounded bg-[var(--admin-danger-btn)] px-4 py-2 text-sm text-white hover:bg-[var(--admin-danger-btn-hover)] disabled:opacity-60"
           >
             {loading ? "Deleting..." : confirmLabel}
           </button>

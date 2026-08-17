@@ -184,19 +184,19 @@ export default function ProjectDrawer({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/50"
+        className="fixed inset-0 z-40 bg-[var(--admin-overlay)]"
         onClick={onClose}
         aria-hidden
       />
-      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col border-l border-[#3c3c3c] bg-[#1e1e1e] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#3c3c3c] bg-[#252526] px-4 py-3">
-          <h2 className="min-w-0 truncate text-lg font-semibold text-[#9cdcfe]">
+      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col border-l border-[var(--admin-border)] bg-[var(--admin-bg)] shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-panel)] px-4 py-3">
+          <h2 className="min-w-0 truncate text-lg font-semibold text-[var(--admin-accent)]">
             {project.title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full hover:bg-[#2a2d2e]"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full hover:bg-[var(--admin-hover)]"
           >
             <FiX className="h-5 w-5" />
           </button>
@@ -204,36 +204,36 @@ export default function ProjectDrawer({
 
         <div className="flex-1 space-y-8 overflow-y-auto p-4">
           {error && (
-            <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
               {error}
             </div>
           )}
 
           {loading ? (
-            <p className="text-sm text-[#858585]">
+            <p className="text-sm text-[var(--admin-muted)]">
               Loading tags & credentials...
             </p>
           ) : (
             <>
               <section>
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <h3 className="font-medium text-[#dcdcaa]">Tags</h3>
+                  <h3 className="font-medium text-[var(--admin-heading)]">Tags</h3>
                   <button
                     type="button"
                     onClick={() => {
                       setModalError(null);
                       setTagForm({ mode: "create", name: "" });
                     }}
-                    className="flex items-center gap-1 rounded bg-[#0e639c] px-3 py-1.5 text-xs text-white hover:bg-[#1177bb]"
+                    className="flex items-center gap-1 rounded bg-[var(--admin-btn)] px-3 py-1.5 text-xs text-white hover:bg-[var(--admin-btn-hover)]"
                   >
                     <FiPlus className="h-3.5 w-3.5" />
                     Create tag
                   </button>
                 </div>
 
-                <div className="overflow-hidden rounded-lg border border-[#3c3c3c]">
+                <div className="overflow-hidden rounded-lg border border-[var(--admin-border)]">
                   <table className="min-w-full text-left text-sm">
-                    <thead className="bg-[#2d2d30] text-[#858585]">
+                    <thead className="bg-[var(--admin-muted-bg)] text-[var(--admin-muted)]">
                       <tr>
                         <th className="px-3 py-2 font-medium">Name</th>
                         <th className="w-24 px-3 py-2 font-medium">Actions</th>
@@ -242,13 +242,13 @@ export default function ProjectDrawer({
                     <tbody>
                       {tags.length === 0 ? (
                         <tr>
-                          <td colSpan={2} className="px-3 py-4 text-[#858585]">
+                          <td colSpan={2} className="px-3 py-4 text-[var(--admin-muted)]">
                             No tags yet.
                           </td>
                         </tr>
                       ) : (
                         tags.map((tag) => (
-                          <tr key={tag.id} className="border-t border-[#3c3c3c]">
+                          <tr key={tag.id} className="border-t border-[var(--admin-border)]">
                             <td className="px-3 py-2">{tag.name}</td>
                             <td className="px-3 py-2">
                               <div className="flex gap-2">
@@ -263,7 +263,7 @@ export default function ProjectDrawer({
                                       name: tag.name,
                                     });
                                   }}
-                                  className="text-[#9cdcfe] hover:text-white"
+                                  className="text-[var(--admin-accent)] hover:text-[var(--admin-icon-hover)]"
                                 >
                                   <FiEdit2 className="h-4 w-4" />
                                 </button>
@@ -277,7 +277,7 @@ export default function ProjectDrawer({
                                       label: tag.name,
                                     })
                                   }
-                                  className="text-[#f14c4c] hover:text-[#ff6b6b]"
+                                  className="text-[var(--admin-danger)] hover:text-[var(--admin-danger-hover)]"
                                 >
                                   <FiTrash2 className="h-4 w-4" />
                                 </button>
@@ -293,23 +293,23 @@ export default function ProjectDrawer({
 
               <section>
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <h3 className="font-medium text-[#dcdcaa]">Credentials</h3>
+                  <h3 className="font-medium text-[var(--admin-heading)]">Credentials</h3>
                   <button
                     type="button"
                     onClick={() => {
                       setModalError(null);
                       setCredForm({ mode: "create", label: "", value: "" });
                     }}
-                    className="flex items-center gap-1 rounded bg-[#0e639c] px-3 py-1.5 text-xs text-white hover:bg-[#1177bb]"
+                    className="flex items-center gap-1 rounded bg-[var(--admin-btn)] px-3 py-1.5 text-xs text-white hover:bg-[var(--admin-btn-hover)]"
                   >
                     <FiPlus className="h-3.5 w-3.5" />
                     Create credential
                   </button>
                 </div>
 
-                <div className="overflow-hidden rounded-lg border border-[#3c3c3c]">
+                <div className="overflow-hidden rounded-lg border border-[var(--admin-border)]">
                   <table className="min-w-full text-left text-sm">
-                    <thead className="bg-[#2d2d30] text-[#858585]">
+                    <thead className="bg-[var(--admin-muted-bg)] text-[var(--admin-muted)]">
                       <tr>
                         <th className="px-3 py-2 font-medium">Label</th>
                         <th className="px-3 py-2 font-medium">Value</th>
@@ -319,7 +319,7 @@ export default function ProjectDrawer({
                     <tbody>
                       {credentials.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="px-3 py-4 text-[#858585]">
+                          <td colSpan={3} className="px-3 py-4 text-[var(--admin-muted)]">
                             No credentials yet.
                           </td>
                         </tr>
@@ -327,10 +327,10 @@ export default function ProjectDrawer({
                         credentials.map((cred) => (
                           <tr
                             key={cred.id}
-                            className="border-t border-[#3c3c3c]"
+                            className="border-t border-[var(--admin-border)]"
                           >
                             <td className="px-3 py-2">{cred.label}</td>
-                            <td className="max-w-[140px] truncate px-3 py-2 font-mono text-xs text-[#ce9178]">
+                            <td className="max-w-[140px] truncate px-3 py-2 font-mono text-xs text-[var(--admin-string)]">
                               {cred.value}
                             </td>
                             <td className="px-3 py-2">
@@ -347,7 +347,7 @@ export default function ProjectDrawer({
                                       value: cred.value,
                                     });
                                   }}
-                                  className="text-[#9cdcfe] hover:text-white"
+                                  className="text-[var(--admin-accent)] hover:text-[var(--admin-icon-hover)]"
                                 >
                                   <FiEdit2 className="h-4 w-4" />
                                 </button>
@@ -361,7 +361,7 @@ export default function ProjectDrawer({
                                       label: cred.label,
                                     })
                                   }
-                                  className="text-[#f14c4c] hover:text-[#ff6b6b]"
+                                  className="text-[var(--admin-danger)] hover:text-[var(--admin-danger-hover)]"
                                 >
                                   <FiTrash2 className="h-4 w-4" />
                                 </button>
@@ -387,12 +387,12 @@ export default function ProjectDrawer({
       >
         <form onSubmit={saveTag} className="space-y-4">
           {modalError && tagForm && (
-            <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
               {modalError}
             </div>
           )}
           <label className="block text-sm">
-            <span className="mb-1 block text-[#858585]">Tag name *</span>
+            <span className="mb-1 block text-[var(--admin-muted)]">Tag name *</span>
             <input
               value={tagForm?.name ?? ""}
               onChange={(e) =>
@@ -402,7 +402,7 @@ export default function ProjectDrawer({
               placeholder="e.g. NestJS"
               required
               autoFocus
-              className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
+              className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
             />
           </label>
           <div className="flex justify-end gap-2">
@@ -410,14 +410,14 @@ export default function ProjectDrawer({
               type="button"
               onClick={closeTagModal}
               disabled={saving}
-              className="rounded bg-[#3c3c3c] px-4 py-2 text-sm hover:bg-[#4e4e4e] disabled:opacity-60"
+              className="rounded bg-[var(--admin-secondary)] px-4 py-2 text-sm hover:bg-[var(--admin-hover-strong)] disabled:opacity-60"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-[#0e639c] px-4 py-2 text-sm text-white hover:bg-[#1177bb] disabled:opacity-60"
+              className="rounded bg-[var(--admin-btn)] px-4 py-2 text-sm text-white hover:bg-[var(--admin-btn-hover)] disabled:opacity-60"
             >
               {saving
                 ? "Saving..."
@@ -439,12 +439,12 @@ export default function ProjectDrawer({
       >
         <form onSubmit={saveCredential} className="space-y-4">
           {modalError && credForm && (
-            <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
               {modalError}
             </div>
           )}
           <label className="block text-sm">
-            <span className="mb-1 block text-[#858585]">Label *</span>
+            <span className="mb-1 block text-[var(--admin-muted)]">Label *</span>
             <input
               value={credForm?.label ?? ""}
               onChange={(e) =>
@@ -454,11 +454,11 @@ export default function ProjectDrawer({
               placeholder="e.g. Username"
               required
               autoFocus
-              className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
+              className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-[#858585]">Value *</span>
+            <span className="mb-1 block text-[var(--admin-muted)]">Value *</span>
             <input
               value={credForm?.value ?? ""}
               onChange={(e) =>
@@ -467,7 +467,7 @@ export default function ProjectDrawer({
               }
               placeholder="e.g. demo@example.com"
               required
-              className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
+              className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
             />
           </label>
           <div className="flex justify-end gap-2">
@@ -475,14 +475,14 @@ export default function ProjectDrawer({
               type="button"
               onClick={closeCredModal}
               disabled={saving}
-              className="rounded bg-[#3c3c3c] px-4 py-2 text-sm hover:bg-[#4e4e4e] disabled:opacity-60"
+              className="rounded bg-[var(--admin-secondary)] px-4 py-2 text-sm hover:bg-[var(--admin-hover-strong)] disabled:opacity-60"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-[#0e639c] px-4 py-2 text-sm text-white hover:bg-[#1177bb] disabled:opacity-60"
+              className="rounded bg-[var(--admin-btn)] px-4 py-2 text-sm text-white hover:bg-[var(--admin-btn-hover)] disabled:opacity-60"
             >
               {saving
                 ? "Saving..."

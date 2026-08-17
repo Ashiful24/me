@@ -97,36 +97,36 @@ export default function AdminProfilesPage() {
     }
   };
 
-  if (loading) return <p className="text-[#858585]">Loading profiles...</p>;
+  if (loading) return <p className="text-[var(--admin-muted)]">Loading profiles...</p>;
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-semibold text-[#9cdcfe]">Profiles</h2>
-        <p className="mt-1 text-sm text-[#858585]">
+        <h2 className="text-2xl font-semibold text-[var(--admin-accent)]">Profiles</h2>
+        <p className="mt-1 text-sm text-[var(--admin-muted)]">
           Update portfolio profile fields via API (create/delete disabled).
         </p>
       </div>
 
       {error && (
-        <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
       {!selected ? (
-        <p className="text-[#858585]">No profile found for this user.</p>
+        <p className="text-[var(--admin-muted)]">No profile found for this user.</p>
       ) : (
         <form
           onSubmit={onSubmit}
-          className="grid gap-3 rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 md:grid-cols-2"
+          className="grid gap-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-panel)] p-4 md:grid-cols-2"
         >
           {EDITABLE.map((key) => (
             <label
               key={key}
               className={`block text-sm ${key === "bio" || key === "siteDescription" ? "md:col-span-2" : ""}`}
             >
-              <span className="mb-1 block text-[#858585]">{key}</span>
+              <span className="mb-1 block text-[var(--admin-muted)]">{key}</span>
               {key === "bio" || key === "siteDescription" ? (
                 <textarea
                   value={form[key] ?? ""}
@@ -134,7 +134,7 @@ export default function AdminProfilesPage() {
                     setForm((prev) => ({ ...prev, [key]: e.target.value }))
                   }
                   rows={4}
-                  className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
+                  className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
                 />
               ) : (
                 <input
@@ -142,30 +142,30 @@ export default function AdminProfilesPage() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, [key]: e.target.value }))
                   }
-                  className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
+                  className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
                 />
               )}
             </label>
           ))}
           <label className="block text-sm md:col-span-2">
-            <span className="mb-1 block text-[#858585]">
+            <span className="mb-1 block text-[var(--admin-muted)]">
               roles (comma-separated)
             </span>
             <input
               value={rolesText}
               onChange={(e) => setRolesText(e.target.value)}
-              className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
+              className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
             />
           </label>
           <div className="md:col-span-2">
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-[#0e639c] px-4 py-2 text-sm text-white hover:bg-[#1177bb] disabled:opacity-60"
+              className="rounded bg-[var(--admin-btn)] px-4 py-2 text-sm text-white hover:bg-[var(--admin-btn-hover)] disabled:opacity-60"
             >
               {saving ? "Saving..." : "Save profile"}
             </button>
-            <p className="mt-2 text-xs text-[#858585]">
+            <p className="mt-2 text-xs text-[var(--admin-muted)]">
               Profile id: {selected.id} · {profiles.length} profile(s)
             </p>
           </div>

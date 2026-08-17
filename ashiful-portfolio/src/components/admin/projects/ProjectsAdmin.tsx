@@ -88,12 +88,12 @@ export default function ProjectsAdmin() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-[#9cdcfe]">Projects</h2>
+          <h2 className="text-2xl font-semibold text-[var(--admin-accent)]">Projects</h2>
         </div>
         <button
           type="button"
           onClick={openCreate}
-          className="flex items-center gap-2 rounded bg-[#0e639c] px-4 py-2 text-sm font-medium text-white hover:bg-[#1177bb]"
+          className="flex items-center gap-2 rounded bg-[var(--admin-btn)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--admin-btn-hover)]"
         >
           <FiPlus className="h-4 w-4" />
           Create project
@@ -101,14 +101,14 @@ export default function ProjectsAdmin() {
       </div>
 
       {error && (
-        <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-[#3c3c3c]">
+      <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-[#2d2d30] text-[#858585]">
+          <thead className="bg-[var(--admin-muted-bg)] text-[var(--admin-muted)]">
             <tr>
               <th className="px-3 py-2 font-medium">Title</th>
               <th className="px-3 py-2 font-medium">File</th>
@@ -119,21 +119,21 @@ export default function ProjectsAdmin() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-3 py-6 text-[#858585]">
+                <td colSpan={4} className="px-3 py-6 text-[var(--admin-muted)]">
                   Loading...
                 </td>
               </tr>
             ) : projects.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-3 py-6 text-[#858585]">
+                <td colSpan={4} className="px-3 py-6 text-[var(--admin-muted)]">
                   No projects yet.
                 </td>
               </tr>
             ) : (
               projects.map((project) => (
-                <tr key={project.id} className="border-t border-[#3c3c3c]">
+                <tr key={project.id} className="border-t border-[var(--admin-border)]">
                   <td className="px-3 py-2">{project.title}</td>
-                  <td className="max-w-xs truncate px-3 py-2 font-mono text-xs text-[#858585]">
+                  <td className="max-w-xs truncate px-3 py-2 font-mono text-xs text-[var(--admin-muted)]">
                     {project.file}
                   </td>
                   <td className="px-3 py-2">{project.sortOrder ?? "—"}</td>
@@ -143,7 +143,7 @@ export default function ProjectsAdmin() {
                         type="button"
                         title="View tags & credentials"
                         onClick={() => openView(project)}
-                        className="text-[#9cdcfe] hover:text-white"
+                        className="text-[var(--admin-accent)] hover:text-[var(--admin-icon-hover)]"
                       >
                         <FiEye className="h-4 w-4" />
                       </button>
@@ -151,7 +151,7 @@ export default function ProjectsAdmin() {
                         type="button"
                         title="Edit"
                         onClick={() => openEdit(project)}
-                        className="text-[#dcdcaa] hover:text-white"
+                        className="text-[var(--admin-heading)] hover:text-[var(--admin-icon-hover)]"
                       >
                         <FiEdit2 className="h-4 w-4" />
                       </button>
@@ -159,7 +159,7 @@ export default function ProjectsAdmin() {
                         type="button"
                         title="Delete"
                         onClick={() => setDeleteProject(project)}
-                        className="text-[#f14c4c] hover:text-[#ff6b6b]"
+                        className="text-[var(--admin-danger)] hover:text-[var(--admin-danger-hover)]"
                       >
                         <FiTrash2 className="h-4 w-4" />
                       </button>

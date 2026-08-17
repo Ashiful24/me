@@ -82,11 +82,11 @@ export default function SkillGroupsAdmin() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold text-[#9cdcfe]">Skill groups</h2>
+        <h2 className="text-2xl font-semibold text-[var(--admin-accent)]">Skill groups</h2>
         <button
           type="button"
           onClick={openCreate}
-          className="flex items-center gap-2 rounded bg-[#0e639c] px-4 py-2 text-sm font-medium text-white hover:bg-[#1177bb]"
+          className="flex items-center gap-2 rounded bg-[var(--admin-btn)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--admin-btn-hover)]"
         >
           <FiPlus className="h-4 w-4" />
           Create group
@@ -94,14 +94,14 @@ export default function SkillGroupsAdmin() {
       </div>
 
       {error && (
-        <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-[#3c3c3c]">
+      <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-[#2d2d30] text-[#858585]">
+          <thead className="bg-[var(--admin-muted-bg)] text-[var(--admin-muted)]">
             <tr>
               <th className="px-3 py-2 font-medium">Title</th>
               <th className="px-3 py-2 font-medium">Order</th>
@@ -111,19 +111,19 @@ export default function SkillGroupsAdmin() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3} className="px-3 py-6 text-[#858585]">
+                <td colSpan={3} className="px-3 py-6 text-[var(--admin-muted)]">
                   Loading...
                 </td>
               </tr>
             ) : groups.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-3 py-6 text-[#858585]">
+                <td colSpan={3} className="px-3 py-6 text-[var(--admin-muted)]">
                   No skill groups yet.
                 </td>
               </tr>
             ) : (
               groups.map((group) => (
-                <tr key={group.id} className="border-t border-[#3c3c3c]">
+                <tr key={group.id} className="border-t border-[var(--admin-border)]">
                   <td className="px-3 py-2">{group.title}</td>
                   <td className="px-3 py-2">{group.sortOrder ?? "—"}</td>
                   <td className="px-3 py-2">
@@ -132,7 +132,7 @@ export default function SkillGroupsAdmin() {
                         type="button"
                         title="Edit"
                         onClick={() => openEdit(group)}
-                        className="text-[#dcdcaa] hover:text-white"
+                        className="text-[var(--admin-heading)] hover:text-[var(--admin-icon-hover)]"
                       >
                         <FiEdit2 className="h-4 w-4" />
                       </button>
@@ -140,7 +140,7 @@ export default function SkillGroupsAdmin() {
                         type="button"
                         title="Delete"
                         onClick={() => setDeleteGroup(group)}
-                        className="text-[#f14c4c] hover:text-[#ff6b6b]"
+                        className="text-[var(--admin-danger)] hover:text-[var(--admin-danger-hover)]"
                       >
                         <FiTrash2 className="h-4 w-4" />
                       </button>

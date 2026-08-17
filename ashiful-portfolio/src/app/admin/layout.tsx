@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AdminThemeProvider } from "@/contexts/AdminThemeContext";
 import AdminShell from "@/components/admin/AdminShell";
 
 function AdminGate({ children }: { children: React.ReactNode }) {
@@ -22,7 +23,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1e1e1e] text-[#858585]">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--admin-bg)] text-[var(--admin-muted)]">
         Loading...
       </div>
     );
@@ -32,7 +33,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1e1e1e] text-[#858585]">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--admin-bg)] text-[var(--admin-muted)]">
         Redirecting to login...
       </div>
     );
@@ -48,7 +49,9 @@ export default function AdminLayout({
 }) {
   return (
     <AuthProvider>
-      <AdminGate>{children}</AdminGate>
+      <AdminThemeProvider>
+        <AdminGate>{children}</AdminGate>
+      </AdminThemeProvider>
     </AuthProvider>
   );
 }

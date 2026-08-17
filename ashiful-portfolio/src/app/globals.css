@@ -59,6 +59,72 @@ body {
   color: #ffffff;
 }
 
+.admin-theme {
+  background-image: none;
+}
+
+[data-admin-theme="dark"] {
+  color-scheme: dark;
+  --admin-bg: #1e1e1e;
+  --admin-panel: #252526;
+  --admin-muted-bg: #2d2d30;
+  --admin-hover: #2a2d2e;
+  --admin-hover-strong: #4e4e4e;
+  --admin-border: #3c3c3c;
+  --admin-text: #d4d4d4;
+  --admin-muted: #858585;
+  --admin-accent: #9cdcfe;
+  --admin-heading: #dcdcaa;
+  --admin-string: #ce9178;
+  --admin-active: #094771;
+  --admin-active-fg: #ffffff;
+  --admin-btn: #0e639c;
+  --admin-btn-hover: #1177bb;
+  --admin-secondary: #3c3c3c;
+  --admin-focus: #007acc;
+  --admin-icon-hover: #ffffff;
+  --admin-danger: #f14c4c;
+  --admin-danger-hover: #ff6b6b;
+  --admin-danger-bg: rgb(90 29 29 / 0.4);
+  --admin-danger-btn: #c42b1c;
+  --admin-danger-btn-hover: #e81123;
+  --admin-overlay: rgb(0 0 0 / 0.5);
+  --admin-overlay-strong: rgb(0 0 0 / 0.65);
+  color: var(--admin-text);
+  background: var(--admin-bg);
+}
+
+[data-admin-theme="light"] {
+  color-scheme: light;
+  --admin-bg: #f4f6f8;
+  --admin-panel: #ffffff;
+  --admin-muted-bg: #eef1f4;
+  --admin-hover: #e8ecef;
+  --admin-hover-strong: #d9dee3;
+  --admin-border: #d7dee5;
+  --admin-text: #1f2328;
+  --admin-muted: #5c6770;
+  --admin-accent: #0466c8;
+  --admin-heading: #6b4f1d;
+  --admin-string: #a31515;
+  --admin-active: #0b69c7;
+  --admin-active-fg: #ffffff;
+  --admin-btn: #0e639c;
+  --admin-btn-hover: #1177bb;
+  --admin-secondary: #e4e9ee;
+  --admin-focus: #007acc;
+  --admin-icon-hover: #0466c8;
+  --admin-danger: #c42b1c;
+  --admin-danger-hover: #a61d12;
+  --admin-danger-bg: rgb(196 43 28 / 0.12);
+  --admin-danger-btn: #c42b1c;
+  --admin-danger-btn-hover: #a61d12;
+  --admin-overlay: rgb(15 23 32 / 0.4);
+  --admin-overlay-strong: rgb(15 23 32 / 0.55);
+  color: var(--admin-text);
+  background: var(--admin-bg);
+}
+
 @media print {
   body {
     background: #ffffff;

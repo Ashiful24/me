@@ -79,21 +79,21 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const navClass = (active: boolean) =>
     `flex items-center gap-3 rounded px-3 py-2 text-sm ${
       collapsed ? "justify-center" : ""
-    } ${active ? "bg-[#094771] text-white" : "hover:bg-[#2a2d2e]"}`;
+    } ${active ? "bg-[var(--admin-active)] text-[var(--admin-active-fg)]" : "hover:bg-[var(--admin-hover)]"}`;
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-[#d4d4d4]">
+    <div className="min-h-screen bg-[var(--admin-bg)] text-[var(--admin-text)]">
       <div className="flex min-h-screen">
         <aside
-          className={`flex shrink-0 flex-col border-r border-[#3c3c3c] bg-[#252526] transition-[width] duration-200 ${
+          className={`flex shrink-0 flex-col border-r border-[var(--admin-border)] bg-[var(--admin-panel)] transition-[width] duration-200 ${
             collapsed ? "w-16" : "w-64"
           }`}
         >
-          <div className="flex items-center justify-between gap-2 border-b border-[#3c3c3c] px-3 py-4">
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--admin-border)] px-3 py-4">
             {!collapsed && (
               <div className="min-w-0">
-                <p className="font-mono text-xs text-[#858585]">admin.panel</p>
-                <h1 className="mt-1 truncate text-lg font-semibold text-[#9cdcfe]">
+                <p className="font-mono text-xs text-[var(--admin-muted)]">admin.panel</p>
+                <h1 className="mt-1 truncate text-lg font-semibold text-[var(--admin-accent)]">
                   {user?.username ?? "Admin"}
                 </h1>
               </div>
@@ -102,7 +102,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               type="button"
               title={collapsed ? "Expand sidebar" : "Minimize sidebar"}
               onClick={toggleCollapsed}
-              className="grid h-8 w-8 shrink-0 place-items-center rounded hover:bg-[#2a2d2e]"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded hover:bg-[var(--admin-hover)]"
             >
               {collapsed ? (
                 <FiChevronRight className="h-4 w-4" />
@@ -154,8 +154,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   collapsed ? "justify-center" : "justify-between"
                 } ${
                   skillsActive
-                    ? "bg-[#094771] text-white"
-                    : "hover:bg-[#2a2d2e]"
+                    ? "bg-[var(--admin-active)] text-[var(--admin-active-fg)]"
+                    : "hover:bg-[var(--admin-hover)]"
                 }`}
               >
                 <span className="flex items-center gap-3">

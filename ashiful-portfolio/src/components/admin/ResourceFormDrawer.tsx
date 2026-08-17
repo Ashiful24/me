@@ -9,7 +9,7 @@ import type { FieldConfig, ResourceConfig } from "@/lib/admin-resources";
 type Row = Record<string, unknown> & { id: string };
 
 const inputClass =
-  "w-full rounded border border-[#3c3c3c] bg-[#252526] px-3 py-2 outline-none focus:border-[#007acc]";
+  "w-full rounded border border-[var(--admin-border)] bg-[var(--admin-panel)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]";
 
 export default function ResourceFormDrawer({
   config,
@@ -151,13 +151,13 @@ export default function ResourceFormDrawer({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/50"
+        className="fixed inset-0 z-40 bg-[var(--admin-overlay)]"
         onClick={onClose}
         aria-hidden
       />
-      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col border-l border-[#3c3c3c] bg-[#1e1e1e] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#3c3c3c] bg-[#252526] px-4 py-3">
-          <h2 className="min-w-0 truncate text-lg font-semibold text-[#9cdcfe]">
+      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col border-l border-[var(--admin-border)] bg-[var(--admin-bg)] shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-panel)] px-4 py-3">
+          <h2 className="min-w-0 truncate text-lg font-semibold text-[var(--admin-accent)]">
             {mode === "create"
               ? `Create ${config.singular}`
               : `Edit ${config.singular}`}
@@ -165,7 +165,7 @@ export default function ResourceFormDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full hover:bg-[#2a2d2e]"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full hover:bg-[var(--admin-hover)]"
           >
             <FiX className="h-5 w-5" />
           </button>
@@ -174,13 +174,13 @@ export default function ResourceFormDrawer({
         <form onSubmit={onSubmit} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
             {error && (
-              <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+              <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
                 {error}
               </div>
             )}
             {visibleFields.map((field) => (
               <label key={field.key} className="block text-sm">
-                <span className="mb-1 block text-[#858585]">
+                <span className="mb-1 block text-[var(--admin-muted)]">
                   {field.label}
                   {field.required ? " *" : ""}
                 </span>
@@ -189,11 +189,11 @@ export default function ResourceFormDrawer({
             ))}
           </div>
 
-          <div className="flex gap-2 border-t border-[#3c3c3c] bg-[#252526] p-4">
+          <div className="flex gap-2 border-t border-[var(--admin-border)] bg-[var(--admin-panel)] p-4">
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded bg-[#0e639c] py-2.5 text-sm font-medium text-white hover:bg-[#1177bb] disabled:opacity-60"
+              className="flex-1 rounded bg-[var(--admin-btn)] py-2.5 text-sm font-medium text-white hover:bg-[var(--admin-btn-hover)] disabled:opacity-60"
             >
               {saving
                 ? "Saving..."
@@ -205,7 +205,7 @@ export default function ResourceFormDrawer({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="rounded bg-[#3c3c3c] px-5 py-2.5 text-sm hover:bg-[#4e4e4e] disabled:opacity-60"
+              className="rounded bg-[var(--admin-secondary)] px-5 py-2.5 text-sm hover:bg-[var(--admin-hover-strong)] disabled:opacity-60"
             >
               Cancel
             </button>

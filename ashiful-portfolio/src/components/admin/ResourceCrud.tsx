@@ -88,12 +88,12 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold text-[#9cdcfe]">{config.label}</h2>
+        <h2 className="text-2xl font-semibold text-[var(--admin-accent)]">{config.label}</h2>
         {canCreate && (
           <button
             type="button"
             onClick={openCreate}
-            className="flex items-center gap-2 rounded bg-[#0e639c] px-4 py-2 text-sm font-medium text-white hover:bg-[#1177bb]"
+            className="flex items-center gap-2 rounded bg-[var(--admin-btn)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--admin-btn-hover)]"
           >
             <FiPlus className="h-4 w-4" />
             Create {config.singular}
@@ -102,14 +102,14 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
       </div>
 
       {error && (
-        <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
+        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-[#3c3c3c]">
+      <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-[#2d2d30] text-[#858585]">
+          <thead className="bg-[var(--admin-muted-bg)] text-[var(--admin-muted)]">
             <tr>
               {config.columns.map((col) => (
                 <th key={col.key} className="px-3 py-2 font-medium">
@@ -124,7 +124,7 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
               <tr>
                 <td
                   colSpan={config.columns.length + 1}
-                  className="px-3 py-6 text-[#858585]"
+                  className="px-3 py-6 text-[var(--admin-muted)]"
                 >
                   Loading...
                 </td>
@@ -133,14 +133,14 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
               <tr>
                 <td
                   colSpan={config.columns.length + 1}
-                  className="px-3 py-6 text-[#858585]"
+                  className="px-3 py-6 text-[var(--admin-muted)]"
                 >
                   No records yet.
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="border-t border-[#3c3c3c]">
+                <tr key={row.id} className="border-t border-[var(--admin-border)]">
                   {config.columns.map((col) => (
                     <td key={col.key} className="max-w-xs truncate px-3 py-2">
                       {cellValue(row[col.key])}
@@ -152,7 +152,7 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
                         type="button"
                         title="Edit"
                         onClick={() => openEdit(row)}
-                        className="text-[#dcdcaa] hover:text-white"
+                        className="text-[var(--admin-heading)] hover:text-[var(--admin-icon-hover)]"
                       >
                         <FiEdit2 className="h-4 w-4" />
                       </button>
@@ -161,7 +161,7 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
                           type="button"
                           title="Delete"
                           onClick={() => setDeleteRow(row)}
-                          className="text-[#f14c4c] hover:text-[#ff6b6b]"
+                          className="text-[var(--admin-danger)] hover:text-[var(--admin-danger-hover)]"
                         >
                           <FiTrash2 className="h-4 w-4" />
                         </button>
