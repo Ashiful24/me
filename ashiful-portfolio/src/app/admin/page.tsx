@@ -18,6 +18,36 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Link
+          href="/admin/projects"
+          className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
+        >
+          <h3 className="font-medium text-[#dcdcaa]">Projects</h3>
+        </Link>
+        <Link
+          href="/admin/stats"
+          className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
+        >
+          <h3 className="font-medium text-[#dcdcaa]">Stats</h3>
+        </Link>
+        <Link
+          href="/admin/experiences"
+          className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
+        >
+          <h3 className="font-medium text-[#dcdcaa]">Experience</h3>
+        </Link>
+        <Link
+          href="/admin/skills/groups"
+          className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
+        >
+          <h3 className="font-medium text-[#dcdcaa]">Skill groups</h3>
+        </Link>
+        <Link
+          href="/admin/skills"
+          className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
+        >
+          <h3 className="font-medium text-[#dcdcaa]">Skills</h3>
+        </Link>
         {ADMIN_RESOURCES.map((resource) => (
           <Link
             key={resource.key}
@@ -25,18 +55,8 @@ export default function AdminDashboardPage() {
             className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
           >
             <h3 className="font-medium text-[#dcdcaa]">{resource.label}</h3>
-            <p className="mt-1 font-mono text-xs text-[#858585]">
-              {resource.path}
-            </p>
           </Link>
         ))}
-        <Link
-          href="/admin/profiles"
-          className="rounded-lg border border-[#3c3c3c] bg-[#252526] p-4 transition hover:border-[#007acc]"
-        >
-          <h3 className="font-medium text-[#dcdcaa]">Profiles</h3>
-          <p className="mt-1 font-mono text-xs text-[#858585]">/profiles</p>
-        </Link>
       </div>
     </div>
   );

@@ -11,9 +11,12 @@ export class ProjectTagsService {
     return this.prisma.projectTag.create({ data: dto });
   }
 
-  async findAll(userId?: string) {
+  async findAll(userId?: string, projectId?: string) {
     return this.prisma.projectTag.findMany({
-      where: userId ? { userId } : undefined,
+      where: {
+        ...(userId ? { userId } : {}),
+        ...(projectId ? { projectId } : {}),
+      },
       orderBy: { createdAt: 'desc' as const },
     });
   }

@@ -1,9 +1,12 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { ResourceConfig } from "@/lib/admin-resources";
+import ConfirmDialog from "./projects/ConfirmDialog";
+import ResourceFormDrawer from "./ResourceFormDrawer";
 
 type Row = Record<string, unknown> & { id: string };
 
@@ -18,20 +21,14 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Row | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [saving, setSaving] = useState(false);
 
-  const emptyForm = useMemo(() => {
-    const form: Record<string, string> = {};
-    for (const field of config.fields) {
-      if (field.fromUserId && user?.id) form[field.key] = user.id;
-      else form[field.key] = "";
-    }
-    return form;
-  }, [config.fields, user?.id]);
+  const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
+  const [formRow, setFormRow] = useState<Row | null>(null);
+  const [deleteRow, setDeleteRow] = useState<Row | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const [form, setForm] = useState<Record<string, string>>(emptyForm);
+  const canCreate = config.canCreate !== false;
+  const canDelete = config.canDelete !== false;
 
   const load = useCallback(async () => {
     if (!user?.id && config.listQuery) return;
@@ -53,103 +50,53 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
     void load();
   }, [load]);
 
-  useEffect(() => {
-    if (!editing && !creating) setForm(emptyForm);
-  }, [emptyForm, editing, creating]);
-
   const openCreate = () => {
-    setEditing(null);
-    setCreating(true);
-    setForm(emptyForm);
+    setFormRow(null);
+    setFormMode("create");
   };
 
   const openEdit = (row: Row) => {
-    setCreating(false);
-    setEditing(row);
-    const next: Record<string, string> = {};
-    for (const field of config.fields) {
-      const value = row[field.key];
-      next[field.key] =
-        value === null || value === undefined ? "" : String(value);
-    }
-    setForm(next);
+    setFormRow(row);
+    setFormMode("edit");
   };
 
-  const closeForm = () => {
-    setCreating(false);
-    setEditing(null);
-    setForm(emptyForm);
+  const closeFormDrawer = () => {
+    setFormMode(null);
+    setFormRow(null);
   };
 
-  const buildPayload = () => {
-    const payload: Record<string, unknown> = {};
-    for (const field of config.fields) {
-      const raw = form[field.key]?.trim() ?? "";
-      if (!raw) {
-        if (field.required && !editing) {
-          throw new Error(`${field.label} is required`);
-        }
-        continue;
-      }
-      if (field.type === "number") payload[field.key] = Number(raw);
-      else payload[field.key] = raw;
-    }
-    return payload;
-  };
-
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+  const confirmDelete = async () => {
+    if (!deleteRow) return;
+    setDeleting(true);
     setError(null);
     try {
-      const payload = buildPayload();
-      if (editing) {
-        await apiFetch(`${config.path}/${editing.id}`, {
-          method: "PATCH",
-          body: payload,
-        });
-      } else {
-        await apiFetch(config.path, { method: "POST", body: payload });
-      }
-      closeForm();
+      await apiFetch(`${config.path}/${deleteRow.id}`, { method: "DELETE" });
+      if (formRow?.id === deleteRow.id) closeFormDrawer();
+      setDeleteRow(null);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
+      setError(err instanceof Error ? err.message : "Failed to delete");
     } finally {
-      setSaving(false);
+      setDeleting(false);
     }
   };
 
-  const onDelete = async (row: Row) => {
-    if (!confirm(`Delete this ${config.label.toLowerCase()} item?`)) return;
-    setError(null);
-    try {
-      await apiFetch(`${config.path}/${row.id}`, { method: "DELETE" });
-      await load();
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Delete failed");
-    }
-  };
-
-  const canCreate = config.key !== "users";
-  const canDelete = config.key !== "users";
+  const deleteLabel = deleteRow
+    ? cellValue(deleteRow[config.columns[0]?.key] ?? deleteRow.id)
+    : "";
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold text-[#9cdcfe]">{config.label}</h2>
-          <p className="mt-1 text-sm text-[#858585]">
-            Live data from <code className="text-[#ce9178]">{config.path}</code>
-          </p>
-        </div>
+        <h2 className="text-2xl font-semibold text-[#9cdcfe]">{config.label}</h2>
         {canCreate && (
           <button
             type="button"
             onClick={openCreate}
-            className="rounded bg-[#0e639c] px-4 py-2 text-sm font-medium text-white hover:bg-[#1177bb]"
+            className="flex items-center gap-2 rounded bg-[#0e639c] px-4 py-2 text-sm font-medium text-white hover:bg-[#1177bb]"
           >
-            Add new
+            <FiPlus className="h-4 w-4" />
+            Create {config.singular}
           </button>
         )}
       </div>
@@ -158,70 +105,6 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
         <div className="rounded border border-[#f14c4c]/40 bg-[#5a1d1d]/40 px-3 py-2 text-sm text-[#f14c4c]">
           {error}
         </div>
-      )}
-
-      {(creating || editing) && (
-        <form
-          onSubmit={onSubmit}
-          className="space-y-3 rounded-lg border border-[#3c3c3c] bg-[#252526] p-4"
-        >
-          <h3 className="font-medium text-[#dcdcaa]">
-            {editing ? "Edit item" : "Create item"}
-          </h3>
-          <div className="grid gap-3 md:grid-cols-2">
-            {config.fields
-              .filter((f) => f.type !== "hidden")
-              .map((field) => (
-                <label key={field.key} className="block text-sm">
-                  <span className="mb-1 block text-[#858585]">
-                    {field.label}
-                    {field.required ? " *" : ""}
-                  </span>
-                  {field.type === "textarea" ? (
-                    <textarea
-                      value={form[field.key] ?? ""}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          [field.key]: e.target.value,
-                        }))
-                      }
-                      rows={4}
-                      className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
-                    />
-                  ) : (
-                    <input
-                      type={field.type === "number" ? "number" : "text"}
-                      value={form[field.key] ?? ""}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          [field.key]: e.target.value,
-                        }))
-                      }
-                      className="w-full rounded border border-[#3c3c3c] bg-[#1e1e1e] px-3 py-2 outline-none focus:border-[#007acc]"
-                    />
-                  )}
-                </label>
-              ))}
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded bg-[#0e639c] px-4 py-2 text-sm text-white hover:bg-[#1177bb] disabled:opacity-60"
-            >
-              {saving ? "Saving..." : "Save"}
-            </button>
-            <button
-              type="button"
-              onClick={closeForm}
-              className="rounded bg-[#3c3c3c] px-4 py-2 text-sm hover:bg-[#4e4e4e]"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
       )}
 
       <div className="overflow-x-auto rounded-lg border border-[#3c3c3c]">
@@ -233,7 +116,7 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
                   {col.label}
                 </th>
               ))}
-              <th className="px-3 py-2 font-medium">Actions</th>
+              <th className="w-32 px-3 py-2 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -263,23 +146,27 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
                       {cellValue(row[col.key])}
                     </td>
                   ))}
-                  <td className="space-x-2 px-3 py-2 whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={() => openEdit(row)}
-                      className="text-[#9cdcfe] hover:underline"
-                    >
-                      Edit
-                    </button>
-                    {canDelete && (
+                  <td className="px-3 py-2">
+                    <div className="flex gap-3">
                       <button
                         type="button"
-                        onClick={() => void onDelete(row)}
-                        className="text-[#f14c4c] hover:underline"
+                        title="Edit"
+                        onClick={() => openEdit(row)}
+                        className="text-[#dcdcaa] hover:text-white"
                       >
-                        Delete
+                        <FiEdit2 className="h-4 w-4" />
                       </button>
-                    )}
+                      {canDelete && (
+                        <button
+                          type="button"
+                          title="Delete"
+                          onClick={() => setDeleteRow(row)}
+                          className="text-[#f14c4c] hover:text-[#ff6b6b]"
+                        >
+                          <FiTrash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -287,6 +174,24 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
           </tbody>
         </table>
       </div>
+
+      <ResourceFormDrawer
+        config={config}
+        mode={formMode}
+        row={formRow}
+        userId={user?.id ?? ""}
+        onClose={closeFormDrawer}
+        onSaved={() => void load()}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deleteRow)}
+        title={`Delete ${config.singular}?`}
+        message={`Are you sure you want to delete "${deleteLabel}"? This cannot be undone.`}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setDeleteRow(null)}
+        loading={deleting}
+      />
     </div>
   );
 }

@@ -26,9 +26,14 @@ export class ExperienceHighlightsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List experience highlights' })
-  findAll(@Query('userId') userId?: string) {
-    return this.service.findAll(userId);
+  @ApiOperation({
+    summary: 'List experience highlights (filter by userId or experienceId)',
+  })
+  findAll(
+    @Query('userId') userId?: string,
+    @Query('experienceId') experienceId?: string,
+  ) {
+    return this.service.findAll(userId, experienceId);
   }
 
   @Get(':id')

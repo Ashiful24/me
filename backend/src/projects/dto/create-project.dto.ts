@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProjectDto {
@@ -16,6 +16,7 @@ export class CreateProjectDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(250)
   description: string;
 
   @IsOptional()

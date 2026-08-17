@@ -26,9 +26,14 @@ export class ProjectCredentialsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List project credentials' })
-  findAll(@Query('userId') userId?: string) {
-    return this.service.findAll(userId);
+  @ApiOperation({
+    summary: 'List project credentials (filter by userId or projectId)',
+  })
+  findAll(
+    @Query('userId') userId?: string,
+    @Query('projectId') projectId?: string,
+  ) {
+    return this.service.findAll(userId, projectId);
   }
 
   @Get(':id')

@@ -11,9 +11,12 @@ export class SkillDetailsService {
     return this.prisma.skillDetail.create({ data: dto });
   }
 
-  async findAll(userId?: string) {
+  async findAll(userId?: string, skillId?: string) {
     return this.prisma.skillDetail.findMany({
-      where: userId ? { userId } : undefined,
+      where: {
+        ...(userId ? { userId } : {}),
+        ...(skillId ? { skillId } : {}),
+      },
       orderBy: { createdAt: 'desc' as const },
     });
   }

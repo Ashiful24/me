@@ -1,227 +1,80 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import type { IconType } from "react-icons";
 import AnimatedSection from "@/components/AnimatedSection";
 import DeveloperProfile from "@/components/DeveloperProfile";
 import DevSectionLabel from "@/components/DevSectionLabel";
 import Footer from "@/components/Footer";
 import FloatingMenu from "@/components/FloatingMenu";
 import Navbar from "@/components/Navbar";
-import ProjectCard, { type Project } from "@/components/ProjectCard";
+import ProjectCard from "@/components/ProjectCard";
 import SkillsGrid from "@/components/SkillsGrid";
-import { FaCode, FaLinkedinIn, FaPhoneAlt } from "react-icons/fa";
-import { SiGithub, SiGmail } from "react-icons/si";
-import { fetchPortfolio, mapProjects } from "@/lib/portfolio";
+import { getIcon } from "@/lib/icons";
+import {
+  fetchPortfolio,
+  hireHrefFromContacts,
+  mapProjects,
+} from "@/lib/portfolio";
 
-const fallbackStats = [
-  { value: "500+", label: "APIs developed" },
-  { value: "6", label: "Production-grade projects" },
-  { value: "200+", label: "Problems solved on Beecrowd" },
-];
+export const dynamic = "force-dynamic";
 
-const fallbackBuildMetric = {
-  value: "40%",
-  label: "search latency improvement",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const portfolio = await fetchPortfolio();
+  const profile = portfolio?.profile;
+  if (!profile) return {};
 
-const fallbackLinkedIn =
-  "https://www.linkedin.com/in/Ashiful-Islam-Istiuk/";
+  return {
+    title: profile.siteTitle || profile.name,
+    description: profile.siteDescription || profile.bio,
+    openGraph: {
+      title: profile.siteTitle || profile.name,
+      description: profile.siteDescription || profile.bio,
+      url: profile.siteUrl || undefined,
+    },
+  };
+}
 
-const fallbackProjects: Project[] = [
-  {
-    file: "hotel_ticketing.service.ts",
-    title: "Hotel Ticketing System",
-    description:
-      "Engineered a robust NestJS backend with Prisma ORM, modular architecture, custom guards, interceptors, decorators, JWT based RBAC, 30+ documented APIs, advanced filtering, pagination, and Jest unit testing.",
-    tags: ["NestJS", "Prisma", "JWT", "Jest"],
-    github: "https://github.com/Ashiful24/hotel-ticketing-system",
-  },
-  {
-    file: "ecommerce_api.module.ts",
-    title: "E-commerce REST API",
-    description:
-      "Developed an e-commerce backend focused on relational data integrity, order processing, and maintainable NestJS modules for users, products, categories, and orders.",
-    tags: ["NestJS", "Prisma", "REST API"],
-    github: "https://github.com/Ashiful24/E-commers-backend",
-  },
-  {
-    file: "g_salon.page.tsx",
-    title: "G-Salon",
-    description:
-      "Built and deployed a production-ready salon website with responsive UI, service listings, appointment booking, and performance optimization.",
-    tags: ["Next.js", "React", "TypeScript", "Tailwind"],
-    github: "https://github.com/Ashiful24/G-Salon",
-    live: "https://g-saloon.vercel.app",
-  },
-  {
-    file: "eventify.cs",
-    title: "Eventify",
-    description:
-      "Created an event management platform as a C# console application using OOP principles for venue exploration, organizer management, event creation, ticket issuing, and bookings.",
-    tags: ["C#", "OOP", "Console App"],
-    github: "https://github.com/Ashiful24/Eventify",
-  },
-  {
-    file: "todo_app.dart",
-    title: "To Do App",
-    description:
-      "Implemented a mobile task app with add, complete, and delete flows using Flutter and Hive, focusing on practical productivity and simple UI interactions.",
-    tags: ["Flutter", "Hive", "Mobile"],
-    github: "https://github.com/Ashiful24/ToDoApp",
-  },
-];
-
-const fallbackServices = [
-  "Full-stack application development with Next.js, React, Node.js, and NestJS",
-  "REST API design, Swagger documentation, and scalable backend modules",
-  "Realtime features using WebSocket, Socket.IO, Redis, and presence systems",
-  "Responsive dashboards and frontend interfaces with Angular, React, and PrimeNG",
-];
-
-const fallbackTimeline = [
-  {
-    year: "Jul 2025 - Present",
-    title: "Junior Software Engineer, Bengal Mobile QA Solution",
-    text: "Contributing to Hope, Shohay, and Otithi with full-stack feature ownership across backend services, frontend modules, APIs, realtime communication, and dashboard improvements.",
-  },
-  {
-    year: "Mar 2025 - Jun 2025",
-    title: "Associate Software Engineer, Bengal Mobile QA Solution",
-    text: "Developed production features in a microservices architecture, including corporate pledging flow, NGO profile modules, hotel/property modules, provider checklists, and UI bug fixes.",
-  },
-  {
-    year: "2020 - 2023",
-    title: "BSc in Software Engineering, Daffodil International University",
-    text: "Completed Software Engineering degree with CGPA 3.44 out of 4.00.",
-  },
-  {
-    year: "2020 - 2024",
-    title: "Leadership & Community",
-    text: "Served as Joint Secretary at Data Sciences Club, DIU and ICT Administrator at Alor Shandhani Blood Foundation.",
-  },
-];
-
-const fallbackHighlights = [
-  "Architected multi-tenancy features for Shohay Enterprise to support scalable corporate client onboarding.",
-  "Integrated Elasticsearch into the Corporate Pledging Flow, improving data retrieval latency by 40%.",
-  "Delivered NGO Profile and Hotel/Property modules from database design to frontend implementation.",
-  "Built realtime backend communication with WebSocket, Socket.IO, and Redis based session/state management.",
-  "Resolved critical dashboard issues and helped maintain 99.9% system uptime.",
-];
-
-const fallbackTestimonials = [
-  {
-    quote:
-      "Ashiful has been my client for the last 12 years at my salon. Recently, I requested him to create a website for my salon, and he did an amazing job. I'm really happy with the result and truly appreciate his work. Highly recommended!",
-    name: "Gaoranggo Chandra Sill",
-    role: "G-Salon",
-  },
-  {
-    quote:
-      "Add a testimonial about a specific project or strength — reliability, code quality, or problem solving.",
-    name: "Add Name",
-    role: "Add Role, Company",
-  },
-  {
-    quote:
-      "Add feedback from a client or collaborator on a freelance or academic project.",
-    name: "Add Name",
-    role: "Add Role, Company",
-  },
-];
-
-const iconMap: Record<string, IconType> = {
-  SiGmail,
-  FaPhoneAlt,
-  FaLinkedinIn,
-  SiGithub,
-  FaCode,
-};
-
-const fallbackContactLinks = [
-  {
-    label: "Email",
-    value: "angkon199@gmail.com\nashiful35-3017@diu.edu.bd",
-    href: "https://mail.google.com/mail/?view=cm&fs=1&to=angkon199@gmail.com,ashiful35-3017@diu.edu.bd",
-    icon: SiGmail,
-    color: "text-[#ea4335]",
-  },
-  {
-    label: "Phone",
-    value: "+8801609884769",
-    href: "tel:+8801609884769",
-    icon: FaPhoneAlt,
-    color: "text-[#9cdcfe]",
-  },
-  {
-    label: "LinkedIn",
-    value: "Ashiful Islam Istiuk",
-    href: "https://www.linkedin.com/in/Ashiful-Islam-Istiuk/",
-    icon: FaLinkedinIn,
-    color: "text-[#0a66c2]",
-  },
-  {
-    label: "GitHub",
-    value: "Ashiful24",
-    href: "https://github.com/Ashiful24",
-    icon: SiGithub,
-    color: "text-white",
-  },
-  {
-    label: "Beecrowd",
-    value: "Profile 463413",
-    href: "https://www.beecrowd.com.br/judge/en/profile/463413",
-    icon: FaCode,
-    color: "text-[#c586c0]",
-  },
-];
+function EmptyNote({ text }: { text: string }) {
+  return <p className="mt-6 font-mono text-sm text-[#858585]">{text}</p>;
+}
 
 export default async function Home() {
   const portfolio = await fetchPortfolio();
 
-  const stats =
-    portfolio?.stats?.length && portfolio.stats.length >= 3
-      ? portfolio.stats.slice(0, 3)
-      : fallbackStats;
+  if (!portfolio) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#1e1e1e] px-6 text-center text-[#d4d4d4]">
+        <div>
+          <p className="font-mono text-sm text-[#f14c4c]">
+            GET /api/portfolio failed
+          </p>
+          <p className="mt-3 max-w-md text-[#858585]">
+            Start the backend on port 4000, then refresh. All site content is
+            loaded from the API.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
+  const { profile, user } = portfolio;
+  const stats = portfolio.stats.slice(0, 3);
   const buildMetric =
-    portfolio?.stats && portfolio.stats.length > 3
+    portfolio.stats.length > 3
       ? {
           value: portfolio.stats[3].value,
           label: portfolio.stats[3].label,
         }
-      : fallbackBuildMetric;
-
-  const linkedInUrl = portfolio?.profile?.linkedInUrl || fallbackLinkedIn;
-  const projects = portfolio?.projects?.length
-    ? mapProjects(portfolio.projects)
-    : fallbackProjects;
-  const services = portfolio?.services?.length
-    ? portfolio.services.map((s) => s.description)
-    : fallbackServices;
-  const timeline = portfolio?.timelineEntries?.length
-    ? portfolio.timelineEntries
-    : fallbackTimeline;
+      : undefined;
+  const projects = mapProjects(portfolio.projects);
+  const featuredExperience = portfolio.experiences[0];
   const highlights =
-    portfolio?.experiences?.[0]?.highlights?.length
-      ? portfolio.experiences[0].highlights.map((h) => h.text)
-      : fallbackHighlights;
-  const testimonials = portfolio?.testimonials?.length
-    ? portfolio.testimonials
-    : fallbackTestimonials;
-  const contactLinks = portfolio?.contactLinks?.length
-    ? portfolio.contactLinks.map((link) => ({
-        label: link.label,
-        value: link.value,
-        href: link.href,
-        icon: iconMap[link.iconKey] ?? FaCode,
-        color: link.color,
-      }))
-    : fallbackContactLinks;
-
-  const heroBio = portfolio?.profile?.bio;
-  const heroTitle = portfolio?.profile?.title || "Junior Software Engineer";
-  const statusLabel = portfolio?.profile?.status || "open_to_work";
-  const locationLabel = portfolio?.profile?.location || "~/dhaka/bd";
+    portfolio.experiences.flatMap((exp) =>
+      exp.highlights.map((h) => h.text),
+    );
+  const hireHref = hireHrefFromContacts(portfolio.contactLinks, user.email);
+  const titleWords = (profile?.title ?? "").trim().split(/\s+/).filter(Boolean);
+  const titleLead = titleWords[0] ?? profile?.name ?? user.username;
+  const titleRest = titleWords.slice(1).join(" ");
 
   return (
     <main className="relative min-h-screen bg-[#1e1e1e] text-[#d4d4d4]">
@@ -241,28 +94,35 @@ export default async function Home() {
           </div>
         </div>
 
-        <Navbar />
+        <Navbar username={user.username} hireHref={hireHref} />
 
         <div
           id="home"
           className="mx-auto grid max-w-7xl items-start gap-10 pb-20 pt-12 lg:grid-cols-[minmax(0,1fr)_36rem] lg:gap-x-5 lg:pb-28 lg:pt-16"
         >
           <div className="min-w-0">
-            <p className="mb-2 inline-flex items-center gap-2 rounded-lg border border-[#3c3c3c] bg-[#252526] px-4 py-2 font-mono text-sm text-[#9cdcfe]">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#28c840]" />
-              {statusLabel} · {locationLabel}
-            </p>
+            {(profile?.status || profile?.location) && (
+              <p className="mb-2 inline-flex items-center gap-2 rounded-lg border border-[#3c3c3c] bg-[#252526] px-4 py-2 font-mono text-sm text-[#9cdcfe]">
+                <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#28c840]" />
+                {[profile?.status, profile?.location]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            )}
 
             <h1 className="mt-1 max-w-4xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              {heroTitle.split(" ").slice(0, 1).join(" ") || "Junior"}
-              <span className="block bg-gradient-to-r from-[#569cd6] via-[#d4d4d4] to-[#c586c0] bg-clip-text text-transparent">
-                {heroTitle.split(" ").slice(1).join(" ") || "Software Engineer"}
-              </span>
+              {titleLead}
+              {titleRest ? (
+                <span className="block bg-gradient-to-r from-[#569cd6] via-[#d4d4d4] to-[#c586c0] bg-clip-text text-transparent">
+                  {titleRest}
+                </span>
+              ) : null}
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#cccccc]">
-              {heroBio ||
-                "I am K. M. Ashiful Islam Istiuk, a software engineer building scalable full-stack applications with TypeScript, Node.js, NestJS, React, and Next.js. I work on REST APIs, microservices, realtime systems, and reliable database driven applications."}
-            </p>
+            {profile?.bio && (
+              <p className="mt-7 max-w-2xl text-lg leading-8 text-[#cccccc]">
+                {profile.bio}
+              </p>
+            )}
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <Link
                 href="/resume"
@@ -279,11 +139,18 @@ export default async function Home() {
             </div>
           </div>
 
-          <DeveloperProfile
-            stats={stats}
-            buildMetric={buildMetric}
-            linkedInUrl={linkedInUrl}
-          />
+          {profile && (
+            <DeveloperProfile
+              name={profile.name}
+              roles={profile.roles}
+              location={profile.location}
+              status={profile.status}
+              linkedInUrl={profile.linkedInUrl}
+              avatarUrl={profile.avatarUrl}
+              stats={stats}
+              buildMetric={buildMetric}
+            />
+          )}
         </div>
       </section>
 
@@ -296,12 +163,13 @@ export default async function Home() {
                 comment="// skills.ts"
               />
             </div>
-            <p className="max-w-xl text-[#cccccc]">
-              Experienced across frontend, backend, realtime communication,
-              databases, DevOps tools, and clean engineering practices.
-            </p>
+            {profile?.siteDescription && (
+              <p className="max-w-xl text-[#cccccc]">
+                {profile.siteDescription}
+              </p>
+            )}
           </div>
-          <SkillsGrid />
+          <SkillsGrid groups={portfolio.skillGroups} />
         </div>
       </AnimatedSection>
 
@@ -309,27 +177,31 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <DevSectionLabel
-              label="Building internal products at Bengal Mobile QA Solution."
+              label={featuredExperience?.title || "Experience"}
               comment="// experience.log"
             />
-            <p className="mt-5 leading-8 text-[#cccccc]">
-              I contributed to Hope, Shohay, and Otithi by taking end-to-end
-              ownership of backend and frontend features in a microservices
-              architecture.
-            </p>
+            {featuredExperience?.subtitle && (
+              <p className="mt-5 leading-8 text-[#cccccc]">
+                {featuredExperience.subtitle}
+              </p>
+            )}
           </div>
           <div className="grid gap-4">
-            {highlights.map((highlight, index) => (
-              <div
-                key={`${index}-${highlight.slice(0, 24)}`}
-                className="rounded-[1.5rem] border border-[#3c3c3c] bg-[#252526] p-5 font-mono text-sm text-[#d4d4d4]"
-              >
-                <span className="text-[#6a9955]">
-                  [{String(index + 1).padStart(2, "0")}]
-                </span>{" "}
-                {highlight}
-              </div>
-            ))}
+            {highlights.length === 0 ? (
+              <EmptyNote text="No experience highlights yet." />
+            ) : (
+              highlights.map((highlight, index) => (
+                <div
+                  key={`${index}-${highlight.slice(0, 24)}`}
+                  className="rounded-[1.5rem] border border-[#3c3c3c] bg-[#252526] p-5 font-mono text-sm text-[#d4d4d4]"
+                >
+                  <span className="text-[#6a9955]">
+                    [{String(index + 1).padStart(2, "0")}]
+                  </span>{" "}
+                  {highlight}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </AnimatedSection>
@@ -337,11 +209,15 @@ export default async function Home() {
       <AnimatedSection id="work" className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <DevSectionLabel label="Selected Work" comment="// projects/" />
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            {projects.map((project) => (
-              <ProjectCard key={project.title} project={project} />
-            ))}
-          </div>
+          {projects.length === 0 ? (
+            <EmptyNote text="No projects published yet." />
+          ) : (
+            <div className="mt-6 grid gap-5 lg:grid-cols-3">
+              {projects.map((project) => (
+                <ProjectCard key={project.title} project={project} />
+              ))}
+            </div>
+          )}
         </div>
       </AnimatedSection>
 
@@ -350,21 +226,28 @@ export default async function Home() {
           <div className="rounded-[2rem] border border-[#007acc]/60 bg-[#007acc] p-8 text-white">
             <p className="font-mono text-sm text-white/70">{"// services.ts"}</p>
             <h2 className="mt-3 text-4xl font-black">
-              From API design to realtime user experiences.
+              {profile?.title || "Services"}
             </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {services.map((service, index) => (
-              <div
-                key={`${index}-${service.slice(0, 24)}`}
-                className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 font-mono text-sm text-[#d4d4d4]"
-              >
-                <span className="text-[#c586c0]">export const</span> service_
-                {String(index + 1).padStart(2, "0")}{" "}
-                <span className="text-[#6a9955]">=</span>{" "}
-                <span className="text-[#ce9178]">&quot;{service}&quot;</span>;
-              </div>
-            ))}
+            {portfolio.services.length === 0 ? (
+              <EmptyNote text="No services published yet." />
+            ) : (
+              portfolio.services.map((service, index) => (
+                <div
+                  key={`${index}-${service.description.slice(0, 24)}`}
+                  className="rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6 font-mono text-sm text-[#d4d4d4]"
+                >
+                  <span className="text-[#c586c0]">export const</span> service_
+                  {String(index + 1).padStart(2, "0")}{" "}
+                  <span className="text-[#6a9955]">=</span>{" "}
+                  <span className="text-[#ce9178]">
+                    &quot;{service.description}&quot;
+                  </span>
+                  ;
+                </div>
+              ))
+            )}
           </div>
         </div>
       </AnimatedSection>
@@ -372,24 +255,28 @@ export default async function Home() {
       <AnimatedSection className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <DevSectionLabel label="Journey" comment="// git log --oneline" />
-          <div className="relative mt-10 space-y-10 border-l border-[#3c3c3c] pl-8 sm:pl-10">
-            {timeline.map((item) => (
-              <div key={item.title} className="relative">
-                <span className="absolute -left-[2.55rem] top-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#007acc] bg-[#1e1e1e] sm:-left-[3.05rem]">
-                  <span className="h-2 w-2 rounded-full bg-[#007acc]" />
-                </span>
-                <p className="font-mono text-xs font-bold text-[#6a9955]">
-                  commit {item.year}
-                </p>
-                <h3 className="mt-1 text-xl font-bold sm:text-2xl">
-                  {item.title}
-                </h3>
-                <p className="mt-2 max-w-3xl leading-7 text-white/60">
-                  {item.text}
-                </p>
-              </div>
-            ))}
-          </div>
+          {portfolio.timelineEntries.length === 0 ? (
+            <EmptyNote text="No timeline entries yet." />
+          ) : (
+            <div className="relative mt-10 space-y-10 border-l border-[#3c3c3c] pl-8 sm:pl-10">
+              {portfolio.timelineEntries.map((item) => (
+                <div key={item.title} className="relative">
+                  <span className="absolute -left-[2.55rem] top-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#007acc] bg-[#1e1e1e] sm:-left-[3.05rem]">
+                    <span className="h-2 w-2 rounded-full bg-[#007acc]" />
+                  </span>
+                  <p className="font-mono text-xs font-bold text-[#6a9955]">
+                    commit {item.year}
+                  </p>
+                  <h3 className="mt-1 text-xl font-bold sm:text-2xl">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 max-w-3xl leading-7 text-white/60">
+                    {item.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </AnimatedSection>
 
@@ -399,27 +286,31 @@ export default async function Home() {
             label="What people say about working with me."
             comment="// testimonials.json"
           />
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <div
-                key={testimonial.name + testimonial.quote}
-                className="flex h-full flex-col rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6"
-              >
-                <p className="font-mono text-xs text-[#6a9955]">
-                  {"/* review */"}
-                </p>
-                <p className="mt-3 flex-1 leading-7 text-[#cccccc]">
-                  {testimonial.quote}
-                </p>
-                <div className="mt-5 border-t border-[#3c3c3c] pt-4 font-mono text-xs">
-                  <p className="font-bold text-[#9cdcfe]">
-                    — {testimonial.name}
+          {portfolio.testimonials.length === 0 ? (
+            <EmptyNote text="No testimonials yet." />
+          ) : (
+            <div className="mt-8 grid gap-5 lg:grid-cols-3">
+              {portfolio.testimonials.map((testimonial) => (
+                <div
+                  key={testimonial.name + testimonial.quote}
+                  className="flex h-full flex-col rounded-[2rem] border border-[#3c3c3c] bg-[#252526] p-6"
+                >
+                  <p className="font-mono text-xs text-[#6a9955]">
+                    {"/* review */"}
                   </p>
-                  <p className="text-[#858585]">{testimonial.role}</p>
+                  <p className="mt-3 flex-1 leading-7 text-[#cccccc]">
+                    {testimonial.quote}
+                  </p>
+                  <div className="mt-5 border-t border-[#3c3c3c] pt-4 font-mono text-xs">
+                    <p className="font-bold text-[#9cdcfe]">
+                      — {testimonial.name}
+                    </p>
+                    <p className="text-[#858585]">{testimonial.role}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </AnimatedSection>
 
@@ -431,41 +322,61 @@ export default async function Home() {
               comment="// contact.ts → send()"
             />
           </div>
-          <p className="mx-auto mt-5 max-w-2xl leading-8 text-[#cccccc]">
-            Open to junior software engineering roles, full-stack product work,
-            backend systems, and modern frontend development.
-          </p>
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {contactLinks.map((link) => {
-              const Icon = link.icon;
+          {profile?.bio && (
+            <p className="mx-auto mt-5 max-w-2xl leading-8 text-[#cccccc]">
+              {profile.bio}
+            </p>
+          )}
+          {portfolio.contactLinks.length === 0 ? (
+            <EmptyNote text="No contact links yet." />
+          ) : (
+            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {portfolio.contactLinks.map((link) => {
+                const Icon = getIcon(link.iconKey);
 
-              return (
-                <a
-                  key={link.label}
-                  aria-label={link.label}
-                  className="flex items-center gap-4 rounded-[1.5rem] border border-[#3c3c3c] bg-[#1e1e1e] p-5 text-left transition hover:-translate-y-1 hover:border-[#007acc]/60 hover:bg-[#2d2d30]"
-                  href={link.href}
-                  target={link.href.startsWith("http") ? "_blank" : undefined}
-                  rel={link.href.startsWith("http") ? "noreferrer" : undefined}
-                >
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl border border-[#3c3c3c] bg-[#252526]">
-                    <Icon
-                      aria-hidden="true"
-                      className={`h-6 w-6 ${link.color}`}
-                    />
-                  </span>
-                  <span className="sr-only">{link.label}</span>
-                  <span className="block min-w-0 whitespace-pre-line break-words text-sm font-semibold text-white">
-                    {link.value}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
+                return (
+                  <a
+                    key={link.label}
+                    aria-label={link.label}
+                    className="flex items-center gap-4 rounded-[1.5rem] border border-[#3c3c3c] bg-[#1e1e1e] p-5 text-left transition hover:-translate-y-1 hover:border-[#007acc]/60 hover:bg-[#2d2d30]"
+                    href={link.href}
+                    target={link.href.startsWith("http") ? "_blank" : undefined}
+                    rel={
+                      link.href.startsWith("http") ? "noreferrer" : undefined
+                    }
+                  >
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl border border-[#3c3c3c] bg-[#252526]">
+                      <Icon
+                        aria-hidden="true"
+                        className={`h-6 w-6 ${link.color}`}
+                      />
+                    </span>
+                    <span className="sr-only">{link.label}</span>
+                    <span className="block min-w-0 whitespace-pre-line break-words text-sm font-semibold text-white">
+                      {link.value}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
       </AnimatedSection>
 
-      <Footer />
+      <Footer
+        name={profile?.name}
+        title={profile?.title}
+        location={profile?.location}
+        socialLinks={portfolio.contactLinks
+          .filter((link) =>
+            ["SiGithub", "FaLinkedinIn", "SiGmail"].includes(link.iconKey),
+          )
+          .map((link) => ({
+            label: link.label,
+            href: link.href,
+            iconKey: link.iconKey,
+          }))}
+      />
       <FloatingMenu />
     </main>
   );

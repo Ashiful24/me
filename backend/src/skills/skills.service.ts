@@ -14,9 +14,12 @@ export class SkillsService {
     });
   }
 
-  async findAll(userId?: string) {
+  async findAll(userId?: string, parentId?: string) {
     return this.prisma.skill.findMany({
-      where: userId ? { userId } : undefined,
+      where: {
+        ...(userId ? { userId } : {}),
+        ...(parentId ? { parentId } : {}),
+      },
       orderBy: { sortOrder: 'asc' as const },
       include: { detail: true, parent: true },
     });

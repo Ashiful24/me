@@ -7,7 +7,15 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-export default function Navbar() {
+export default function Navbar({
+  username,
+  hireHref,
+}: {
+  username?: string;
+  hireHref?: string;
+}) {
+  const hireIsExternal = Boolean(hireHref?.startsWith("http") || hireHref?.startsWith("mailto:"));
+
   return (
     <header className="px-0 py-3">
       <nav className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[#3c3c3c] bg-[#252526]/80 px-5 py-3 backdrop-blur">
@@ -16,7 +24,9 @@ export default function Navbar() {
           className="font-mono text-xs font-semibold tracking-wide sm:text-sm"
         >
           <span className="text-[#569cd6]">~/</span>
-          <span className="text-white">ashiful_islam_istiuk</span>
+          <span className="text-white">
+            {username || "ashiful_islam_istiuk"}
+          </span>
         </a>
 
         <div className="hidden items-center gap-8 text-sm text-[#cccccc] md:flex">
@@ -39,9 +49,9 @@ export default function Navbar() {
 
         <a
           className="rounded-full bg-[#007acc] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#3794ff]"
-          href="https://mail.google.com/mail/?view=cm&fs=1&to=angkon199@gmail.com&su=Portfolio%20Inquiry"
-          target="_blank"
-          rel="noreferrer"
+          href={hireHref || "#contact"}
+          target={hireIsExternal ? "_blank" : undefined}
+          rel={hireIsExternal ? "noreferrer" : undefined}
         >
           Hire Me
         </a>

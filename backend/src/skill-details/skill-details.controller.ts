@@ -26,9 +26,14 @@ export class SkillDetailsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List skill details' })
-  findAll(@Query('userId') userId?: string) {
-    return this.service.findAll(userId);
+  @ApiOperation({
+    summary: 'List skill details (filter by userId or skillId)',
+  })
+  findAll(
+    @Query('userId') userId?: string,
+    @Query('skillId') skillId?: string,
+  ) {
+    return this.service.findAll(userId, skillId);
   }
 
   @Get(':id')

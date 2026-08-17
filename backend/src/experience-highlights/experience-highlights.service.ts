@@ -11,9 +11,12 @@ export class ExperienceHighlightsService {
     return this.prisma.experienceHighlight.create({ data: dto });
   }
 
-  async findAll(userId?: string) {
+  async findAll(userId?: string, experienceId?: string) {
     return this.prisma.experienceHighlight.findMany({
-      where: userId ? { userId } : undefined,
+      where: {
+        ...(userId ? { userId } : {}),
+        ...(experienceId ? { experienceId } : {}),
+      },
       orderBy: { sortOrder: 'asc' as const },
     });
   }
