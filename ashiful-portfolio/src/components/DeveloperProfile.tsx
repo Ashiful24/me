@@ -10,10 +10,7 @@ type Stat = {
   label: string;
 };
 
-type BuildMetric = {
-  value: string;
-  label: string;
-};
+const METRIC_PREFIX = "metric";
 
 function TypingRole({
   role,
@@ -62,8 +59,9 @@ export default function DeveloperProfile({
   status,
   linkedInUrl,
   avatarUrl,
+  username,
   stats,
-  buildMetric,
+  metricStats = [],
 }: {
   name: string;
   roles: string[];
@@ -71,13 +69,17 @@ export default function DeveloperProfile({
   status: string;
   linkedInUrl: string;
   avatarUrl: string;
+  username?: string;
   stats: Stat[];
-  buildMetric?: BuildMetric;
+  metricStats?: Stat[];
 }) {
   const [roleIndex, setRoleIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
   const cycleRoles = roles.length > 0 ? roles : [status];
   const handle = linkedInHandle(linkedInUrl);
+  const windowLabel = username
+    ? `profile.ts — ~/${username}`
+    : "profile.ts";
 
   const handleRoleComplete = useCallback(() => {
     setRoleIndex((current) => (current + 1) % cycleRoles.length);
@@ -91,133 +93,126 @@ export default function DeveloperProfile({
     return () => window.clearInterval(blink);
   }, []);
 
+  const avatarBlock = (sizeClass: string) =>
+    avatarUrl ? (
+      <div
+        className={`relative overflow-hidden rounded-2xl border-2 border-[#007acc]/60 ${sizeClass}`}
+      >
+        <Image
+          src={avatarUrl}
+          alt={name}
+          fill
+          priority
+          unoptimized={avatarUrl.startsWith("http")}
+          className="object-cover object-center"
+          sizes="192px"
+        />
+      </div>
+    ) : (
+      <div
+        className={`grid place-items-center rounded-2xl border-2 border-dashed border-[#3c3c3c] bg-[#252526] font-mono text-xs text-[#858585] ${sizeClass}`}
+      >
+        no avatar
+      </div>
+    );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="relative w-full max-w-xl"
+      className="relative mx-auto w-full max-w-xl lg:mx-0"
     >
-      <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-[#007acc]/25 to-[#c586c0]/10 blur-2xl" />
+      <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-[#007acc]/25 to-[#c586c0]/10 blur-2xl sm:-inset-4" />
 
       <div className="relative overflow-hidden rounded-2xl border border-[#3c3c3c] bg-[#1e1e1e] shadow-2xl shadow-black/40">
-        <div className="flex items-center gap-2 border-b border-[#3c3c3c] bg-[#252526] px-4 py-3">
-          <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-          <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-          <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-          <span className="ml-2 font-mono text-xs text-[#858585]">
-            profile.ts — ~/ashiful-portfolio
+        <div className="flex items-center gap-2 border-b border-[#3c3c3c] bg-[#252526] px-3 py-2.5 sm:px-4 sm:py-3">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#ff5f57] sm:h-3 sm:w-3" />
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#febc2e] sm:h-3 sm:w-3" />
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#28c840] sm:h-3 sm:w-3" />
+          <span className="ml-1 min-w-0 truncate font-mono text-[10px] text-[#858585] sm:ml-2 sm:text-xs">
+            {windowLabel}
           </span>
         </div>
 
-        <div className="relative p-5 sm:p-6">
+        <div className="relative p-4 sm:p-6">
           <div className="absolute right-3 top-3 hidden sm:block">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="relative h-40 w-40 overflow-hidden rounded-2xl border-2 border-[#007acc]/60 shadow-lg shadow-[#007acc]/20"
-            >
-              <Image
-                src={avatarUrl || "/profile.png"}
-                alt={name}
-                fill
-                priority
-                unoptimized={avatarUrl.startsWith("http")}
-                className="object-cover object-center"
-                sizes="160px"
-              />
+            <motion.div whileHover={{ scale: 1.05 }}>
+              {avatarBlock("h-40 w-40 shadow-lg shadow-[#007acc]/20")}
             </motion.div>
             <p className="mt-2 text-center font-mono text-[10px] text-[#858585]">
               avatar.png
             </p>
           </div>
 
-          <div className="font-mono text-[13px] leading-7 sm:pr-44">
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">1</span>
-              <p>
-                <span className="text-[#c586c0]">export const</span>{" "}
-                <span className="text-[#4ec9b0]">developer</span>{" "}
-                <span className="text-[#d4d4d4]">= {"{"}</span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">2</span>
-              <p>
-                <span className="text-[#9cdcfe]">name</span>
-                <span className="text-[#d4d4d4]">: </span>
-                <span className="text-[#ce9178]">&quot;{name}&quot;</span>
-                <span className="text-[#d4d4d4]">,</span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">3</span>
-              <p>
-                <span className="text-[#9cdcfe]">role</span>
-                <span className="text-[#d4d4d4]">: </span>
-                <TypingRole
-                  key={cycleRoles[roleIndex]}
-                  role={cycleRoles[roleIndex]}
-                  showCursor={showCursor}
-                  onComplete={handleRoleComplete}
-                />
-                <span className="text-[#d4d4d4]">,</span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">4</span>
-              <p>
-                <span className="text-[#9cdcfe]">location</span>
-                <span className="text-[#d4d4d4]">: </span>
-                <span className="text-[#ce9178]">&quot;{location}&quot;</span>
-                <span className="text-[#d4d4d4]">,</span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">5</span>
-              <p>
-                <span className="text-[#9cdcfe]">status</span>
-                <span className="text-[#d4d4d4]">: </span>
-                <span className="text-[#ce9178]">&quot;{status}&quot;</span>
-                <span className="text-[#d4d4d4]">,</span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">6</span>
-              <p>
-                <span className="text-[#9cdcfe]">linkedin</span>
-                <span className="text-[#d4d4d4]">: </span>
-                {linkedInUrl ? (
-                  <a
-                    href={linkedInUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#ce9178] underline decoration-[#007acc]/50 underline-offset-2 transition hover:text-[#9cdcfe]"
-                  >
-                    &quot;{handle}&quot;
-                  </a>
-                ) : (
-                  <span className="text-[#ce9178]">&quot;&quot;</span>
-                )}
-                <span className="text-[#d4d4d4]">,</span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="select-none text-[#858585]">7</span>
-              <p className="text-[#d4d4d4]">{"};"}</p>
-            </div>
+          <div className="min-w-0 font-mono text-[12px] leading-6 sm:pr-44 sm:text-[13px] sm:leading-7">
+            {(
+              [
+                <>
+                  <span className="text-[#c586c0]">export const</span>{" "}
+                  <span className="text-[#4ec9b0]">developer</span>{" "}
+                  <span className="text-[#d4d4d4]">= {"{"}</span>
+                </>,
+                <>
+                  <span className="text-[#9cdcfe]">name</span>
+                  <span className="text-[#d4d4d4]">: </span>
+                  <span className="text-[#ce9178]">&quot;{name}&quot;</span>
+                  <span className="text-[#d4d4d4]">,</span>
+                </>,
+                <>
+                  <span className="text-[#9cdcfe]">role</span>
+                  <span className="text-[#d4d4d4]">: </span>
+                  <TypingRole
+                    key={cycleRoles[roleIndex]}
+                    role={cycleRoles[roleIndex]}
+                    showCursor={showCursor}
+                    onComplete={handleRoleComplete}
+                  />
+                  <span className="text-[#d4d4d4]">,</span>
+                </>,
+                <>
+                  <span className="text-[#9cdcfe]">location</span>
+                  <span className="text-[#d4d4d4]">: </span>
+                  <span className="text-[#ce9178]">&quot;{location}&quot;</span>
+                  <span className="text-[#d4d4d4]">,</span>
+                </>,
+                <>
+                  <span className="text-[#9cdcfe]">status</span>
+                  <span className="text-[#d4d4d4]">: </span>
+                  <span className="text-[#ce9178]">&quot;{status}&quot;</span>
+                  <span className="text-[#d4d4d4]">,</span>
+                </>,
+                <>
+                  <span className="text-[#9cdcfe]">linkedin</span>
+                  <span className="text-[#d4d4d4]">: </span>
+                  {linkedInUrl ? (
+                    <a
+                      href={linkedInUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#ce9178] underline decoration-[#007acc]/50 underline-offset-2 transition hover:text-[#9cdcfe]"
+                    >
+                      &quot;{handle}&quot;
+                    </a>
+                  ) : (
+                    <span className="text-[#ce9178]">&quot;&quot;</span>
+                  )}
+                  <span className="text-[#d4d4d4]">,</span>
+                </>,
+                <span className="text-[#d4d4d4]">{"};"}</span>,
+              ] as const
+            ).map((line, i) => (
+              <div key={i} className="flex gap-2 sm:gap-3">
+                <span className="w-3 shrink-0 select-none text-right text-[#858585]">
+                  {i + 1}
+                </span>
+                <p className="min-w-0 break-words">{line}</p>
+              </div>
+            ))}
           </div>
 
           <div className="mt-6 block sm:hidden">
-            <div className="relative mx-auto h-48 w-48 overflow-hidden rounded-2xl border-2 border-[#007acc]/60">
-              <Image
-                src={avatarUrl || "/profile.png"}
-                alt={name}
-                fill
-                unoptimized={avatarUrl.startsWith("http")}
-                className="object-cover object-center"
-                sizes="192px"
-              />
-            </div>
+            <div className="mx-auto h-40 w-40">{avatarBlock("h-40 w-40")}</div>
             {linkedInUrl ? (
               <a
                 href={linkedInUrl}
@@ -230,38 +225,51 @@ export default function DeveloperProfile({
             ) : null}
           </div>
 
-          {stats.length > 0 && (
+          {(stats.length > 0 || metricStats.length > 0) && (
             <div className="mt-6 border-t border-[#3c3c3c] pt-4">
               <p className="font-mono text-xs text-[#6a9955]">
                 $ npm run stats --production
               </p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                {stats.map((item, index) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + index * 0.12 }}
-                    whileHover={{
-                      scale: 1.03,
-                      borderColor: "rgba(0, 122, 204, 0.6)",
-                    }}
-                    className="rounded-xl border border-[#3c3c3c] bg-[#252526] p-3 font-mono transition-colors hover:bg-[#2d2d30]"
-                  >
-                    <p className="text-lg font-bold text-[#4ec9b0]">
-                      {item.value}
-                    </p>
-                    <p className="mt-1 text-[10px] leading-4 text-[#858585]">
-                      {item.label}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-              {buildMetric && (
-                <div className="mt-2 flex items-center gap-2 font-mono text-xs">
-                  <span className="text-[#858585]">build time:</span>
-                  <span className="text-[#4ec9b0]">{buildMetric.value}</span>
-                  <span className="text-[#858585]">· {buildMetric.label}</span>
+              {stats.length > 0 && (
+                <div className="mt-3 grid grid-cols-1 gap-3 min-[400px]:grid-cols-3">
+                  {stats.map((item, index) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + index * 0.12 }}
+                      whileHover={{
+                        scale: 1.03,
+                        borderColor: "rgba(0, 122, 204, 0.6)",
+                      }}
+                      className="rounded-xl border border-[#3c3c3c] bg-[#252526] p-3 font-mono transition-colors hover:bg-[#2d2d30]"
+                    >
+                      <p className="text-lg font-bold text-[#4ec9b0]">
+                        {item.value}
+                      </p>
+                      <p className="mt-1 break-words text-[10px] leading-4 text-[#858585]">
+                        {item.label}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+              {metricStats.length > 0 && (
+                <div
+                  className={`space-y-1 ${stats.length > 0 ? "mt-2" : "mt-3"}`}
+                >
+                  {metricStats.map((item) => (
+                    <div
+                      key={`${item.value}-${item.label}`}
+                      className="flex flex-wrap items-center gap-2 font-mono text-xs"
+                    >
+                      <span className="text-[#858585]">{METRIC_PREFIX}:</span>
+                      <span className="text-[#4ec9b0]">{item.value}</span>
+                      <span className="break-words text-[#858585]">
+                        · {item.label}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

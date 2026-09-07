@@ -16,12 +16,15 @@ export class CreateTimelineEntryDto {
 
   @IsString()
   @IsNotEmpty()
+  subtitle: string;
+
+  @IsString()
+  @IsNotEmpty()
   text: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

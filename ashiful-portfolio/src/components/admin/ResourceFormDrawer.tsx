@@ -5,6 +5,7 @@ import { FiX } from "react-icons/fi";
 import { apiFetch } from "@/lib/api";
 import { ICON_KEYS } from "@/lib/icons";
 import type { FieldConfig, ResourceConfig } from "@/lib/admin-resources";
+import { useToast } from "@/contexts/ToastContext";
 
 type Row = Record<string, unknown> & { id: string };
 
@@ -39,7 +40,7 @@ export default function ResourceFormDrawer({
 
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (mode === "edit" && row) {
@@ -53,7 +54,6 @@ export default function ResourceFormDrawer({
     } else if (mode === "create") {
       setForm(emptyForm);
     }
-    setError(null);
   }, [mode, row, emptyForm, visibleFields]);
 
   if (!mode) return null;
@@ -78,7 +78,6 @@ export default function ResourceFormDrawer({
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError(null);
     try {
       const payload = buildPayload();
       if (mode === "edit" && row) {
@@ -86,13 +85,15 @@ export default function ResourceFormDrawer({
           method: "PATCH",
           body: payload,
         });
+        toast.success(`${config.singular} updated.`);
       } else {
         await apiFetch(config.path, { method: "POST", body: payload });
+        toast.success(`${config.singular} created.`);
       }
       onSaved();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save");
+      toast.error(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -125,10 +126,15 @@ export default function ResourceFormDrawer({
       return (
         <textarea
           value={form[field.key] ?? ""}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, [field.key]: e.target.value }))
-          }
+          onChange={(e) => {
+            const value =
+              field.maxLength != null
+                ? e.target.value.slice(0, field.maxLength)
+                : e.target.value;
+            setForm((prev) => ({ ...prev, [field.key]: value }));
+          }}
           required={field.required}
+          maxLength={field.maxLength}
           rows={4}
           className={inputClass}
         />
@@ -139,10 +145,15 @@ export default function ResourceFormDrawer({
       <input
         type={field.type === "number" ? "number" : "text"}
         value={form[field.key] ?? ""}
-        onChange={(e) =>
-          setForm((prev) => ({ ...prev, [field.key]: e.target.value }))
-        }
+        onChange={(e) => {
+          const value =
+            field.maxLength != null
+              ? e.target.value.slice(0, field.maxLength)
+              : e.target.value;
+          setForm((prev) => ({ ...prev, [field.key]: value }));
+        }}
         required={field.required}
+        maxLength={field.maxLength}
         className={inputClass}
       />
     );
@@ -173,16 +184,18 @@ export default function ResourceFormDrawer({
 
         <form onSubmit={onSubmit} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
-            {error && (
-              <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-                {error}
-              </div>
-            )}
             {visibleFields.map((field) => (
               <label key={field.key} className="block text-sm">
-                <span className="mb-1 block text-[var(--admin-muted)]">
-                  {field.label}
-                  {field.required ? " *" : ""}
+                <span className="mb-1 flex items-center justify-between gap-2 text-[var(--admin-muted)]">
+                  <span>
+                    {field.label}
+                    {field.required ? " *" : ""}
+                  </span>
+                  {field.maxLength != null ? (
+                    <span className="font-mono text-[11px]">
+                      {(form[field.key] ?? "").length}/{field.maxLength}
+                    </span>
+                  ) : null}
                 </span>
                 {renderField(field)}
               </label>

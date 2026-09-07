@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
 import type { SkillFormData } from "./SkillFormDrawer";
 
 type DetailForm = {
@@ -28,9 +29,9 @@ export default function SkillDetailDrawer({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const toast = useToast();
   const [form, setForm] = useState(emptyDetail);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (skill?.detail) {
@@ -42,7 +43,6 @@ export default function SkillDetailDrawer({
     } else {
       setForm(emptyDetail);
     }
-    setError(null);
   }, [skill]);
 
   if (!skill) return null;
@@ -53,7 +53,6 @@ export default function SkillDetailDrawer({
     e.preventDefault();
     if (!userId) return;
     setSaving(true);
-    setError(null);
     try {
       const payload = {
         knowledge: form.knowledge.trim(),
@@ -66,18 +65,18 @@ export default function SkillDetailDrawer({
           method: "PATCH",
           body: payload,
         });
+        toast.success("Skill details updated.");
       } else {
         await apiFetch("/skill-details", {
           method: "POST",
           body: { ...payload, userId, skillId: skill.id },
         });
+        toast.success("Skill details saved.");
       }
       onSaved();
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save skill details",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to save skill details");
     } finally {
       setSaving(false);
     }
@@ -109,11 +108,6 @@ export default function SkillDetailDrawer({
           className="flex flex-1 flex-col overflow-hidden"
         >
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
-            {error && (
-              <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-                {error}
-              </div>
-            )}
 
             <label className="block text-sm">
               <span className="mb-1 block text-[var(--admin-muted)]">Knowledge *</span>

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
 
 export type ExperienceFormData = {
   id: string;
@@ -33,7 +34,7 @@ export default function ExperienceFormDrawer({
 }) {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (mode === "edit" && experience) {
@@ -45,7 +46,6 @@ export default function ExperienceFormDrawer({
     } else if (mode === "create") {
       setForm(emptyForm);
     }
-    setError(null);
   }, [mode, experience]);
 
   if (!mode) return null;
@@ -54,31 +54,30 @@ export default function ExperienceFormDrawer({
     e.preventDefault();
     if (!userId) return;
     setSaving(true);
-    setError(null);
     try {
       const payload: Record<string, unknown> = {
         title: form.title.trim(),
         subtitle: form.subtitle.trim(),
+        sortOrder: Number(form.sortOrder),
       };
-      if (form.sortOrder.trim()) payload.sortOrder = Number(form.sortOrder);
 
       if (mode === "edit" && experience) {
         await apiFetch(`/experiences/${experience.id}`, {
           method: "PATCH",
           body: payload,
         });
+        toast.success("Experience updated.");
       } else {
         await apiFetch("/experiences", {
           method: "POST",
           body: { ...payload, userId },
         });
+        toast.success("Experience created.");
       }
       onSaved();
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save experience",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to save experience");
     } finally {
       setSaving(false);
     }
@@ -110,11 +109,6 @@ export default function ExperienceFormDrawer({
           className="flex flex-1 flex-col overflow-hidden"
         >
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
-            {error && (
-              <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-                {error}
-              </div>
-            )}
 
             <label className="block text-sm">
               <span className="mb-1 block text-[var(--admin-muted)]">Title *</span>
@@ -139,13 +133,14 @@ export default function ExperienceFormDrawer({
             </label>
 
             <label className="block text-sm">
-              <span className="mb-1 block text-[var(--admin-muted)]">Sort order</span>
+              <span className="mb-1 block text-[var(--admin-muted)]">Sort order *</span>
               <input
                 type="number"
                 value={form.sortOrder}
                 onChange={(e) =>
                   setForm({ ...form, sortOrder: e.target.value })
                 }
+                required
                 className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-panel)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
               />
             </label>

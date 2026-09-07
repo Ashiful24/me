@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "./ConfirmDialog";
 import ProjectDrawer from "./ProjectDrawer";
 import ProjectFormDrawer, { type ProjectFormData } from "./ProjectFormDrawer";
@@ -12,9 +13,9 @@ type Project = ProjectFormData;
 
 export default function ProjectsAdmin() {
   const { user } = useAuth();
+  const toast = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [formProject, setFormProject] = useState<Project | null>(null);
@@ -26,14 +27,13 @@ export default function ProjectsAdmin() {
   const load = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
-    setError(null);
     try {
       const data = await apiFetch<Project[]>(
         `/projects?userId=${encodeURIComponent(user.id)}`,
       );
       setProjects(data);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to load projects");
+      toast.error(err instanceof ApiError ? err.message : "Failed to load projects");
       setProjects([]);
     } finally {
       setLoading(false);
@@ -70,15 +70,15 @@ export default function ProjectsAdmin() {
   const confirmDeleteProject = async () => {
     if (!deleteProject) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`/projects/${deleteProject.id}`, { method: "DELETE" });
       if (viewProject?.id === deleteProject.id) setViewProject(null);
       if (formProject?.id === deleteProject.id) closeFormDrawer();
       setDeleteProject(null);
+      toast.success("Project deleted.");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete project");
+      toast.error(err instanceof Error ? err.message : "Failed to delete project");
     } finally {
       setDeleting(false);
     }
@@ -99,12 +99,6 @@ export default function ProjectsAdmin() {
           Create project
         </button>
       </div>
-
-      {error && (
-        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-          {error}
-        </div>
-      )}
 
       <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">

@@ -6,6 +6,7 @@ export type FieldConfig = {
   type?: FieldType;
   required?: boolean;
   fromUserId?: boolean;
+  maxLength?: number;
 };
 
 export type ResourceConfig = {
@@ -28,13 +29,21 @@ export const ADMIN_RESOURCES: ResourceConfig[] = [
     singular: "service",
     path: "/services",
     columns: [
+      { key: "tag", label: "Tag" },
       { key: "description", label: "Description" },
       { key: "sortOrder", label: "Order" },
     ],
     fields: [
       { key: "userId", label: "User ID", type: "hidden", fromUserId: true, required: true },
-      { key: "description", label: "Description", type: "textarea", required: true },
-      { key: "sortOrder", label: "Sort order", type: "number" },
+      { key: "tag", label: "Tag", required: true, maxLength: 24 },
+      {
+        key: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+        maxLength: 110,
+      },
+      { key: "sortOrder", label: "Sort order", type: "number", required: true },
     ],
     listQuery: (userId) => `?userId=${encodeURIComponent(userId)}`,
   },
@@ -46,14 +55,16 @@ export const ADMIN_RESOURCES: ResourceConfig[] = [
     columns: [
       { key: "year", label: "Year" },
       { key: "title", label: "Title" },
+      { key: "subtitle", label: "Subtitle" },
       { key: "sortOrder", label: "Order" },
     ],
     fields: [
       { key: "userId", label: "User ID", type: "hidden", fromUserId: true, required: true },
       { key: "year", label: "Year", required: true },
       { key: "title", label: "Title", required: true },
+      { key: "subtitle", label: "Subtitle", required: true },
       { key: "text", label: "Text", type: "textarea", required: true },
-      { key: "sortOrder", label: "Sort order", type: "number" },
+      { key: "sortOrder", label: "Sort order", type: "number", required: true },
     ],
     listQuery: (userId) => `?userId=${encodeURIComponent(userId)}`,
   },
@@ -72,7 +83,7 @@ export const ADMIN_RESOURCES: ResourceConfig[] = [
       { key: "quote", label: "Quote", type: "textarea", required: true },
       { key: "name", label: "Name", required: true },
       { key: "role", label: "Role", required: true },
-      { key: "sortOrder", label: "Sort order", type: "number" },
+      { key: "sortOrder", label: "Sort order", type: "number", required: true },
     ],
     listQuery: (userId) => `?userId=${encodeURIComponent(userId)}`,
   },
@@ -91,9 +102,7 @@ export const ADMIN_RESOURCES: ResourceConfig[] = [
       { key: "label", label: "Label", required: true },
       { key: "value", label: "Value", required: true },
       { key: "href", label: "Href", required: true },
-      { key: "iconKey", label: "Icon key", required: true },
-      { key: "color", label: "Color class", required: true },
-      { key: "sortOrder", label: "Sort order", type: "number" },
+      { key: "sortOrder", label: "Sort order", type: "number", required: true },
     ],
     listQuery: (userId) => `?userId=${encodeURIComponent(userId)}`,
   },

@@ -14,18 +14,9 @@ export class CreateSkillDto {
   @IsNotEmpty()
   title: string;
 
-  @IsString()
-  @IsNotEmpty()
-  iconKey: string;
-
-  @IsString()
-  @IsNotEmpty()
-  color: string;
-
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

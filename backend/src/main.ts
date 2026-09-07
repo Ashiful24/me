@@ -1,12 +1,19 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import { ensureUploadDirs, UPLOADS_ROOT } from './uploads/upload-paths';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  ensureUploadDirs();
+  app.useStaticAssets(UPLOADS_ROOT, { prefix: '/uploads' });
 
   app.setGlobalPrefix('api');
+  app.useGlobalFilters(new PrismaExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -62,5 +69,6 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`API running on http://localhost:${port}/api`);
   console.log(`Swagger UI: http://localhost:${port}/api/docs`);
+  console.log(`Uploads: http://localhost:${port}/uploads`);
 }
 void bootstrap();

@@ -1,6 +1,20 @@
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
+/** Backend origin without /api — used for /uploads/... static files */
+export const ASSETS_BASE_URL =
+  process.env.NEXT_PUBLIC_ASSETS_URL ??
+  (API_URL.replace(/\/api\/?$/, "") || "http://localhost:4000");
+
+export function resolveAssetUrl(path: string | null | undefined): string {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.startsWith("/uploads/")) {
+    return `${ASSETS_BASE_URL}${path}`;
+  }
+  return path;
+}
+
 const ACCESS_KEY = "admin_access_token";
 const REFRESH_KEY = "admin_refresh_token";
 const USER_KEY = "admin_user";

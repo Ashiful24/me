@@ -27,10 +27,9 @@ export class CreateProjectDto {
   @IsString()
   live?: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

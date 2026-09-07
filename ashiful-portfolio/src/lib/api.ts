@@ -116,6 +116,56 @@ export async function apiFetch<T = unknown>(
   return (await res.json()) as T;
 }
 
+export async function apiUpload<T = unknown>(
+  path: string,
+  formData: FormData,
+): Promise<T> {
+  const buildHeaders = (): Record<string, string> => {
+    const next: Record<string, string> = {};
+    const token = getAccessToken();
+    if (token) next.Authorization = `Bearer ${token}`;
+    return next;
+  };
+
+  const doFetch = () =>
+    fetch(`${API_URL}${path}`, {
+      method: "POST",
+      headers: buildHeaders(),
+      body: formData,
+    });
+
+  let res = await doFetch();
+
+  if (res.status === 401) {
+    const ok = await ensureRefreshed();
+    if (ok) {
+      res = await doFetch();
+    }
+  }
+
+  if (!res.ok) {
+    let details: unknown;
+    try {
+      details = await res.json();
+    } catch {
+      details = await res.text();
+    }
+    const message =
+      typeof details === "object" &&
+      details &&
+      "message" in details &&
+      details.message
+        ? Array.isArray(details.message)
+          ? details.message.join(", ")
+          : String(details.message)
+        : `Request failed (${res.status})`;
+    throw new ApiError(message, res.status, details);
+  }
+
+  if (res.status === 204) return undefined as T;
+  return (await res.json()) as T;
+}
+
 export async function loginRequest(
   emailOrPhone: string,
   password: string,

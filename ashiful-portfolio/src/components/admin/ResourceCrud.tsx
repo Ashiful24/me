@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import type { ResourceConfig } from "@/lib/admin-resources";
 import ConfirmDialog from "./projects/ConfirmDialog";
 import ResourceFormDrawer from "./ResourceFormDrawer";
@@ -18,9 +19,9 @@ function cellValue(value: unknown) {
 
 export default function ResourceCrud({ config }: { config: ResourceConfig }) {
   const { user } = useAuth();
+  const toast = useToast();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [formRow, setFormRow] = useState<Row | null>(null);
@@ -33,13 +34,12 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
   const load = useCallback(async () => {
     if (!user?.id && config.listQuery) return;
     setLoading(true);
-    setError(null);
     try {
       const query = config.listQuery?.(user!.id) ?? "";
       const data = await apiFetch<Row[]>(`${config.path}${query}`);
       setRows(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to load");
+      toast.error(err instanceof ApiError ? err.message : "Failed to load");
       setRows([]);
     } finally {
       setLoading(false);
@@ -68,14 +68,14 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
   const confirmDelete = async () => {
     if (!deleteRow) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`${config.path}/${deleteRow.id}`, { method: "DELETE" });
       if (formRow?.id === deleteRow.id) closeFormDrawer();
       setDeleteRow(null);
+      toast.success(`${config.singular} deleted.`);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete");
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
     } finally {
       setDeleting(false);
     }
@@ -100,12 +100,6 @@ export default function ResourceCrud({ config }: { config: ResourceConfig }) {
           </button>
         )}
       </div>
-
-      {error && (
-        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-          {error}
-        </div>
-      )}
 
       <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">

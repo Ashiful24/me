@@ -93,6 +93,7 @@ model Profile {
   siteUrl         String
   siteTitle       String
   siteDescription String   @db.Text
+  showTestimonials Boolean @default(false)
   roles           String[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -117,6 +118,7 @@ model Stat {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -138,6 +140,7 @@ model Project {
   tags        ProjectTag[]
   credentials ProjectCredential[]
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -190,12 +193,14 @@ model Experience {
   user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   highlights ExperienceHighlight[]
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
 model Service {
   id          String   @id @default(cuid())
   userId      String
+  tag         String
   description String   @db.Text
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
@@ -205,6 +210,7 @@ model Service {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -222,6 +228,7 @@ model ExperienceHighlight {
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
 
+  @@unique([experienceId, sortOrder])
   @@index([userId])
   @@index([experienceId])
 }
@@ -231,6 +238,7 @@ model TimelineEntry {
   userId    String
   year      String
   title     String
+  subtitle  String   @default("")
   text      String   @db.Text
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
@@ -240,6 +248,7 @@ model TimelineEntry {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -257,6 +266,7 @@ model Testimonial {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -276,6 +286,7 @@ model ContactLink {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -292,6 +303,7 @@ model SkillGroup {
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   skills Skill[]
 
+  @@unique([userId, sortOrder])
   @@index([userId])
 }
 
@@ -312,6 +324,7 @@ model Skill {
   parent SkillGroup   @relation(fields: [parentId], references: [id], onDelete: Cascade)
   detail SkillDetail?
 
+  @@unique([parentId, sortOrder])
   @@index([userId])
   @@index([parentId])
 }

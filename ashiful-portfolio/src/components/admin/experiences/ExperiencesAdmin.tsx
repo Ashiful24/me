@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "../projects/ConfirmDialog";
 import ExperienceDrawer from "./ExperienceDrawer";
 import ExperienceFormDrawer, {
@@ -14,9 +15,9 @@ type Experience = ExperienceFormData;
 
 export default function ExperiencesAdmin() {
   const { user } = useAuth();
+  const toast = useToast();
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [formExperience, setFormExperience] = useState<Experience | null>(null);
@@ -30,16 +31,13 @@ export default function ExperiencesAdmin() {
   const load = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
-    setError(null);
     try {
       const data = await apiFetch<Experience[]>(
         `/experiences?userId=${encodeURIComponent(user.id)}`,
       );
       setExperiences(data);
     } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Failed to load experiences",
-      );
+      toast.error(err instanceof ApiError ? err.message : "Failed to load experiences");
       setExperiences([]);
     } finally {
       setLoading(false);
@@ -76,7 +74,6 @@ export default function ExperiencesAdmin() {
   const confirmDeleteExperience = async () => {
     if (!deleteExperience) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`/experiences/${deleteExperience.id}`, {
         method: "DELETE",
@@ -84,11 +81,10 @@ export default function ExperiencesAdmin() {
       if (viewExperience?.id === deleteExperience.id) setViewExperience(null);
       if (formExperience?.id === deleteExperience.id) closeFormDrawer();
       setDeleteExperience(null);
+      toast.success("Experience deleted.");
       await load();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete experience",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to delete experience");
     } finally {
       setDeleting(false);
     }
@@ -107,12 +103,6 @@ export default function ExperiencesAdmin() {
           Create experience
         </button>
       </div>
-
-      {error && (
-        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-          {error}
-        </div>
-      )}
 
       <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">

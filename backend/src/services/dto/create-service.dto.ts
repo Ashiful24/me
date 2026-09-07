@@ -1,4 +1,10 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateServiceDto {
@@ -8,12 +14,17 @@ export class CreateServiceDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(24)
+  tag: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(110)
   description: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

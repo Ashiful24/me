@@ -3,26 +3,26 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { ApiError } from "@/lib/api";
 import AdminThemeToggle from "@/components/admin/AdminThemeToggle";
 
 export default function AdminLoginPage() {
   const { login } = useAuth();
+  const toast = useToast();
   const router = useRouter();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
     try {
       await login(emailOrPhone.trim(), password);
       router.replace("/admin");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Login failed");
+      toast.error(err instanceof ApiError ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -66,12 +66,6 @@ export default function AdminLoginPage() {
               className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 py-2 outline-none focus:border-[var(--admin-focus)]"
             />
           </label>
-
-          {error && (
-            <p className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"

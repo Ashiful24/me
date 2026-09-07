@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { PrismaClient, Role, UserStatus } from "@prisma/client";
+import { resolveContactVisuals } from "../src/contact-links/contact-icon.util";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -399,6 +400,7 @@ async function main() {
       siteTitle: "K. M. Ashiful Islam Istiuk | Junior Software Engineer",
       siteDescription:
         "Portfolio of K. M. Ashiful Islam Istiuk, a junior software engineer experienced with TypeScript, Node.js, NestJS, React, Next.js, REST APIs, microservices, and realtime systems.",
+      showTestimonials: false,
       roles: [
         "Junior Software Engineer",
         "Full-Stack Developer",
@@ -563,13 +565,30 @@ async function main() {
 
   await prisma.service.createMany({
     data: [
-      "Full-stack application development with Next.js, React, Node.js, and NestJS",
-      "REST API design, Swagger documentation, and scalable backend modules",
-      "Realtime features using WebSocket, Socket.IO, Redis, and presence systems",
-      "Responsive dashboards and frontend interfaces with Angular, React, and PrimeNG",
-    ].map((description, index) => ({
+      {
+        tag: "Full-stack",
+        description:
+          "Full-stack application development with Next.js, React, Node.js, and NestJS",
+      },
+      {
+        tag: "API",
+        description:
+          "REST API design, Swagger documentation, and scalable backend modules",
+      },
+      {
+        tag: "Realtime",
+        description:
+          "Realtime features using WebSocket, Socket.IO, Redis, and presence systems",
+      },
+      {
+        tag: "Frontend",
+        description:
+          "Responsive dashboards and frontend interfaces with Angular, React, and PrimeNG",
+      },
+    ].map((service, index) => ({
       userId,
-      description,
+      tag: service.tag,
+      description: service.description,
       sortOrder: index,
       createdBy: userId,
       updatedBy: userId,
@@ -580,22 +599,26 @@ async function main() {
     data: [
       {
         year: "Jul 2025 - Present",
-        title: "Junior Software Engineer, Bengal Mobile QA Solution",
+        title: "Junior Software Engineer",
+        subtitle: "Bengal Mobile QA Solution",
         text: "Contributing to Hope, Shohay, and Otithi with full-stack feature ownership across backend services, frontend modules, APIs, realtime communication, and dashboard improvements.",
       },
       {
         year: "Mar 2025 - Jun 2025",
-        title: "Associate Software Engineer, Bengal Mobile QA Solution",
+        title: "Associate Software Engineer",
+        subtitle: "Bengal Mobile QA Solution",
         text: "Developed production features in a microservices architecture, including corporate pledging flow, NGO profile modules, hotel/property modules, provider checklists, and UI bug fixes.",
       },
       {
         year: "2020 - 2023",
-        title: "BSc in Software Engineering, Daffodil International University",
+        title: "BSc in Software Engineering",
+        subtitle: "Daffodil International University",
         text: "Completed Software Engineering degree with CGPA 3.44 out of 4.00.",
       },
       {
         year: "2020 - 2024",
         title: "Leadership & Community",
+        subtitle: "DIU & Alor Shandhani Blood Foundation",
         text: "Served as Joint Secretary at Data Sciences Club, DIU and ICT Administrator at Alor Shandhani Blood Foundation.",
       },
     ].map((entry, index) => ({
@@ -642,44 +665,38 @@ async function main() {
         label: "Email",
         value: "angkon199@gmail.com\nashiful35-3017@diu.edu.bd",
         href: "https://mail.google.com/mail/?view=cm&fs=1&to=angkon199@gmail.com,ashiful35-3017@diu.edu.bd",
-        iconKey: "SiGmail",
-        color: "text-[#ea4335]",
       },
       {
         label: "Phone",
         value: "+8801609884769",
         href: "tel:+8801609884769",
-        iconKey: "FaPhoneAlt",
-        color: "text-[#9cdcfe]",
       },
       {
         label: "LinkedIn",
         value: "Ashiful Islam Istiuk",
         href: "https://www.linkedin.com/in/Ashiful-Islam-Istiuk/",
-        iconKey: "FaLinkedinIn",
-        color: "text-[#0a66c2]",
       },
       {
         label: "GitHub",
         value: "Ashiful24",
         href: "https://github.com/Ashiful24",
-        iconKey: "SiGithub",
-        color: "text-white",
       },
       {
         label: "Beecrowd",
         value: "Profile 463413",
         href: "https://www.beecrowd.com.br/judge/en/profile/463413",
-        iconKey: "FaCode",
-        color: "text-[#c586c0]",
       },
-    ].map((item, index) => ({
-      userId,
-      ...item,
-      sortOrder: index,
-      createdBy: userId,
-      updatedBy: userId,
-    })),
+    ].map((item, index) => {
+      const visuals = resolveContactVisuals(item.label, item.href);
+      return {
+        userId,
+        ...item,
+        ...visuals,
+        sortOrder: index,
+        createdBy: userId,
+        updatedBy: userId,
+      };
+    }),
   });
 
   for (const [groupIndex, group] of skillGroups.entries()) {

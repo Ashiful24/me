@@ -10,10 +10,9 @@ export class CreateSkillGroupDto {
   @IsNotEmpty()
   title: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

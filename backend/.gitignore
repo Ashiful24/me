@@ -8,3 +8,9 @@ dist
 .claude
 .windsurf
 skills-lock.json
+
+# Uploaded media (keep folder structure)
+/uploads/avatars/*
+!/uploads/avatars/.gitkeep
+/uploads/resumes/*
+!/uploads/resumes/.gitkeep

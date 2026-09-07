@@ -14,10 +14,9 @@ export class CreateExperienceHighlightDto {
   @IsNotEmpty()
   text: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

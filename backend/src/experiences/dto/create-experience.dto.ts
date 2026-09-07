@@ -14,10 +14,9 @@ export class CreateExperienceDto {
   @IsNotEmpty()
   subtitle: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

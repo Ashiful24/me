@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AdminThemeProvider } from "@/contexts/AdminThemeContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 import AdminShell from "@/components/admin/AdminShell";
 
 function AdminGate({ children }: { children: React.ReactNode }) {
@@ -50,7 +51,9 @@ export default function AdminLayout({
   return (
     <AuthProvider>
       <AdminThemeProvider>
-        <AdminGate>{children}</AdminGate>
+        <ToastProvider>
+          <AdminGate>{children}</AdminGate>
+        </ToastProvider>
       </AdminThemeProvider>
     </AuthProvider>
   );

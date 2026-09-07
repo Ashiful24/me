@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "../projects/ConfirmDialog";
 import FormModal from "../projects/FormModal";
 
@@ -33,14 +34,13 @@ export default function ExperienceDrawer({
   userId: string;
   onClose: () => void;
 }) {
+  const toast = useToast();
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [highlightForm, setHighlightForm] = useState<HighlightFormState | null>(
     null,
   );
-  const [modalError, setModalError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [deleteTarget, setDeleteTarget] = useState<Highlight | null>(null);
@@ -49,14 +49,13 @@ export default function ExperienceDrawer({
   const load = useCallback(async () => {
     if (!experience) return;
     setLoading(true);
-    setError(null);
     try {
       const data = await apiFetch<Highlight[]>(
         `/experience-highlights?experienceId=${encodeURIComponent(experience.id)}`,
       );
       setHighlights(data);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError
           ? err.message
           : "Failed to load experience highlights",
@@ -64,47 +63,52 @@ export default function ExperienceDrawer({
     } finally {
       setLoading(false);
     }
-  }, [experience]);
+  }, [experience, toast]);
 
   useEffect(() => {
     if (experience) void load();
     else {
       setHighlights([]);
       setHighlightForm(null);
-      setModalError(null);
     }
   }, [experience, load]);
 
   const closeHighlightModal = () => {
     setHighlightForm(null);
-    setModalError(null);
   };
 
   const saveHighlight = async (e: FormEvent) => {
     e.preventDefault();
     if (!experience || !highlightForm?.text.trim()) return;
     setSaving(true);
-    setModalError(null);
     try {
       if (highlightForm.mode === "edit" && highlightForm.id) {
         await apiFetch(`/experience-highlights/${highlightForm.id}`, {
           method: "PATCH",
           body: { text: highlightForm.text.trim() },
         });
+        toast.success("Highlight updated.");
       } else {
+        const nextOrder =
+          highlights.reduce(
+            (max, item) => Math.max(max, item.sortOrder ?? -1),
+            -1,
+          ) + 1;
         await apiFetch("/experience-highlights", {
           method: "POST",
           body: {
             userId,
             experienceId: experience.id,
             text: highlightForm.text.trim(),
+            sortOrder: nextOrder,
           },
         });
+        toast.success("Highlight created.");
       }
       closeHighlightModal();
       await load();
     } catch (err) {
-      setModalError(
+      toast.error(
         err instanceof Error ? err.message : "Failed to save highlight",
       );
     } finally {
@@ -115,15 +119,15 @@ export default function ExperienceDrawer({
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`/experience-highlights/${deleteTarget.id}`, {
         method: "DELETE",
       });
       setDeleteTarget(null);
+      toast.success("Highlight deleted.");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
+      toast.error(err instanceof Error ? err.message : "Delete failed");
     } finally {
       setDeleting(false);
     }
@@ -153,12 +157,6 @@ export default function ExperienceDrawer({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          {error && (
-            <div className="mb-4 rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-              {error}
-            </div>
-          )}
-
           {loading ? (
             <p className="text-sm text-[var(--admin-muted)]">Loading highlights...</p>
           ) : (
@@ -168,7 +166,6 @@ export default function ExperienceDrawer({
                 <button
                   type="button"
                   onClick={() => {
-                    setModalError(null);
                     setHighlightForm({ mode: "create", text: "" });
                   }}
                   className="flex items-center gap-1 rounded bg-[var(--admin-btn)] px-3 py-1.5 text-xs text-white hover:bg-[var(--admin-btn-hover)]"
@@ -206,7 +203,6 @@ export default function ExperienceDrawer({
                                 type="button"
                                 title="Edit"
                                 onClick={() => {
-                                  setModalError(null);
                                   setHighlightForm({
                                     mode: "edit",
                                     id: item.id,
@@ -248,11 +244,6 @@ export default function ExperienceDrawer({
         onClose={closeHighlightModal}
       >
         <form onSubmit={saveHighlight} className="space-y-4">
-          {modalError && highlightForm && (
-            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-              {modalError}
-            </div>
-          )}
           <label className="block text-sm">
             <span className="mb-1 block text-[var(--admin-muted)]">Highlight *</span>
             <textarea

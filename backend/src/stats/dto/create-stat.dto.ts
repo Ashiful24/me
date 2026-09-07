@@ -14,10 +14,9 @@ export class CreateStatDto {
   @IsNotEmpty()
   label: string;
 
-  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  sortOrder?: number;
+  sortOrder: number;
 
   @IsOptional()
   @IsString()

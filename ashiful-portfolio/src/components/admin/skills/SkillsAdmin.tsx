@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "../projects/ConfirmDialog";
 import SkillDetailDrawer from "./SkillDetailDrawer";
 import SkillFormDrawer, {
@@ -15,11 +16,11 @@ type Skill = SkillFormData;
 
 export default function SkillsAdmin() {
   const { user } = useAuth();
+  const toast = useToast();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [groups, setGroups] = useState<SkillGroupOption[]>([]);
   const [groupId, setGroupId] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [formSkill, setFormSkill] = useState<Skill | null>(null);
@@ -43,14 +44,13 @@ export default function SkillsAdmin() {
   const loadSkills = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
-    setError(null);
     try {
       const params = new URLSearchParams({ userId: user.id });
       if (groupId) params.set("groupId", groupId);
       const skillData = await apiFetch<Skill[]>(`/skills?${params.toString()}`);
       setSkills(skillData);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to load skills");
+      toast.error(err instanceof ApiError ? err.message : "Failed to load skills");
       setSkills([]);
     } finally {
       setLoading(false);
@@ -95,15 +95,15 @@ export default function SkillsAdmin() {
   const confirmDeleteSkill = async () => {
     if (!deleteSkill) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`/skills/${deleteSkill.id}`, { method: "DELETE" });
       if (detailSkill?.id === deleteSkill.id) setDetailSkill(null);
       if (formSkill?.id === deleteSkill.id) closeFormDrawer();
       setDeleteSkill(null);
+      toast.success("Skill deleted.");
       await reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete skill");
+      toast.error(err instanceof Error ? err.message : "Failed to delete skill");
     } finally {
       setDeleting(false);
     }
@@ -144,12 +144,6 @@ export default function SkillsAdmin() {
         <p className="text-sm text-[var(--admin-muted)]">
           Create a skill group first, then add skills.
         </p>
-      )}
-
-      {error && (
-        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-          {error}
-        </div>
       )}
 
       <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">

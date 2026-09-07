@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "../projects/ConfirmDialog";
 import StatFormDrawer, { type StatFormData } from "./StatFormDrawer";
 
@@ -11,9 +12,9 @@ type Stat = StatFormData;
 
 export default function StatsAdmin() {
   const { user } = useAuth();
+  const toast = useToast();
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [formStat, setFormStat] = useState<Stat | null>(null);
@@ -24,14 +25,13 @@ export default function StatsAdmin() {
   const load = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
-    setError(null);
     try {
       const data = await apiFetch<Stat[]>(
         `/stats?userId=${encodeURIComponent(user.id)}`,
       );
       setStats(data);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to load stats");
+      toast.error(err instanceof ApiError ? err.message : "Failed to load stats");
       setStats([]);
     } finally {
       setLoading(false);
@@ -60,14 +60,14 @@ export default function StatsAdmin() {
   const confirmDeleteStat = async () => {
     if (!deleteStat) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`/stats/${deleteStat.id}`, { method: "DELETE" });
       if (formStat?.id === deleteStat.id) closeFormDrawer();
       setDeleteStat(null);
+      toast.success("Stat deleted.");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete stat");
+      toast.error(err instanceof Error ? err.message : "Failed to delete stat");
     } finally {
       setDeleting(false);
     }
@@ -86,12 +86,6 @@ export default function StatsAdmin() {
           Create stat
         </button>
       </div>
-
-      {error && (
-        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-          {error}
-        </div>
-      )}
 
       <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">

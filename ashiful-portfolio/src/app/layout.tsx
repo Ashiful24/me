@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { fetchPortfolio } from "@/lib/portfolio";
+import { resolveAssetUrl } from "@/lib/auth-storage";
 import "./globals.css";
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -16,52 +18,51 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const siteUrl = "https://ashiful-portfolio.vercel.app";
-const siteTitle = "K. M. Ashiful Islam Istiuk | Junior Software Engineer";
-const siteDescription =
-  "Portfolio of K. M. Ashiful Islam Istiuk, a junior software engineer experienced with TypeScript, Node.js, NestJS, React, Next.js, REST APIs, microservices, and realtime systems.";
+export async function generateMetadata(): Promise<Metadata> {
+  const portfolio = await fetchPortfolio();
+  const profile = portfolio?.profile;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: siteTitle,
-    template: "%s | K. M. Ashiful Islam Istiuk",
-  },
-  description: siteDescription,
-  keywords: [
-    "Ashiful Islam Istiuk",
-    "Software Engineer",
-    "NestJS Developer",
-    "Next.js Developer",
-    "TypeScript",
-    "Full Stack Developer Bangladesh",
-  ],
-  authors: [{ name: "K. M. Ashiful Islam Istiuk" }],
-  icons: {
-    icon: "/favicon.ico",
-  },
-  openGraph: {
-    type: "website",
-    url: siteUrl,
-    title: siteTitle,
-    description: siteDescription,
-    siteName: "K. M. Ashiful Islam Istiuk",
-    images: [
-      {
-        url: "/profile.png",
-        width: 1200,
-        height: 1200,
-        alt: "K. M. Ashiful Islam Istiuk",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteTitle,
-    description: siteDescription,
-    images: ["/profile.png"],
-  },
-};
+  if (!profile) {
+    return {
+      title: "Portfolio",
+      description: "Personal portfolio",
+    };
+  }
+
+  const title = profile.siteTitle || profile.name;
+  const description = profile.siteDescription || profile.bio;
+  const siteUrl = profile.siteUrl || undefined;
+  const avatar = resolveAssetUrl(profile.avatarUrl) || undefined;
+
+  return {
+    metadataBase: siteUrl ? new URL(siteUrl) : undefined,
+    title: {
+      default: title,
+      template: `%s | ${profile.name}`,
+    },
+    description,
+    authors: [{ name: profile.name }],
+    icons: {
+      icon: "/favicon.ico",
+    },
+    openGraph: {
+      type: "website",
+      url: siteUrl,
+      title,
+      description,
+      siteName: profile.name,
+      images: avatar
+        ? [{ url: avatar, width: 1200, height: 1200, alt: profile.name }]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: avatar ? [avatar] : undefined,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

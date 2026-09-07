@@ -41,6 +41,7 @@ export type PortfolioPayload = {
     siteUrl: string;
     siteTitle: string;
     siteDescription: string;
+    showTestimonials: boolean;
     roles: string[];
   } | null;
   stats: { value: string; label: string }[];
@@ -60,8 +61,13 @@ export type PortfolioPayload = {
     subtitle: string;
     highlights: { text: string }[];
   }[];
-  services: { description: string }[];
-  timelineEntries: { year: string; title: string; text: string }[];
+  services: { tag: string; description: string }[];
+  timelineEntries: {
+    year: string;
+    title: string;
+    subtitle: string;
+    text: string;
+  }[];
   testimonials: { quote: string; name: string; role: string }[];
   contactLinks: {
     label: string;
@@ -74,8 +80,9 @@ export type PortfolioPayload = {
 };
 
 export async function fetchPortfolio(
-  username = "ashiful_islam_istiuk",
+  username = process.env.NEXT_PUBLIC_PORTFOLIO_USERNAME?.trim() || "",
 ): Promise<PortfolioPayload | null> {
+  if (!username) return null;
   try {
     const res = await fetch(
       `${API_URL}/portfolio?username=${encodeURIComponent(username)}`,
@@ -130,4 +137,61 @@ export function linkedInHandle(url: string) {
   } catch {
     return "linkedin";
   }
+}
+
+function normalizeContactKey(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+/** Phone / Gmail / WhatsApp — shown in Contact terminal only. */
+export function isDirectContactLink(link: {
+  label: string;
+  href: string;
+  iconKey: string;
+}) {
+  const label = normalizeContactKey(link.label);
+  const href = link.href.trim().toLowerCase();
+  const icon = link.iconKey;
+
+  if (
+    label.includes("phone") ||
+    label.includes("mobile") ||
+    label === "tel" ||
+    href.startsWith("tel:") ||
+    href.startsWith("sms:") ||
+    icon === "FaPhoneAlt"
+  ) {
+    return true;
+  }
+
+  if (
+    label.includes("email") ||
+    label.includes("gmail") ||
+    label === "mail" ||
+    href.startsWith("mailto:") ||
+    href.includes("mail.google.com") ||
+    icon === "SiGmail"
+  ) {
+    return true;
+  }
+
+  if (
+    label.includes("whatsapp") ||
+    href.includes("wa.me") ||
+    href.includes("whatsapp.com") ||
+    icon === "FaWhatsapp" ||
+    icon === "SiWhatsapp"
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+export function splitContactLinks(
+  links: PortfolioPayload["contactLinks"],
+) {
+  const contactLinks = links.filter(isDirectContactLink);
+  const footerLinks = links.filter((link) => !isDirectContactLink(link));
+  return { contactLinks, footerLinks };
 }

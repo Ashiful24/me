@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiEye, FiLogOut, FiUser } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
+import { resolveAssetUrl } from "@/lib/auth-storage";
 import AdminThemeToggle from "./AdminThemeToggle";
 
 export default function AdminNavbar({
@@ -34,7 +35,7 @@ export default function AdminNavbar({
     router.replace("/admin/login");
   };
 
-  const src = avatarUrl || "/profile.png";
+  const src = resolveAssetUrl(avatarUrl) || "/profile.png";
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-end gap-3 border-b border-[var(--admin-border)] bg-[var(--admin-panel)] px-4">

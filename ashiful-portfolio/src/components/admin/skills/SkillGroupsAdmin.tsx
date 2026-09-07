@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "../projects/ConfirmDialog";
 import SkillGroupFormDrawer, {
   type SkillGroupFormData,
@@ -13,9 +14,9 @@ type SkillGroup = SkillGroupFormData;
 
 export default function SkillGroupsAdmin() {
   const { user } = useAuth();
+  const toast = useToast();
   const [groups, setGroups] = useState<SkillGroup[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const [formGroup, setFormGroup] = useState<SkillGroup | null>(null);
@@ -26,16 +27,13 @@ export default function SkillGroupsAdmin() {
   const load = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
-    setError(null);
     try {
       const data = await apiFetch<SkillGroup[]>(
         `/skill-groups?userId=${encodeURIComponent(user.id)}`,
       );
       setGroups(data);
     } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Failed to load skill groups",
-      );
+      toast.error(err instanceof ApiError ? err.message : "Failed to load skill groups");
       setGroups([]);
     } finally {
       setLoading(false);
@@ -64,16 +62,14 @@ export default function SkillGroupsAdmin() {
   const confirmDeleteGroup = async () => {
     if (!deleteGroup) return;
     setDeleting(true);
-    setError(null);
     try {
       await apiFetch(`/skill-groups/${deleteGroup.id}`, { method: "DELETE" });
       if (formGroup?.id === deleteGroup.id) closeFormDrawer();
       setDeleteGroup(null);
+      toast.success("Skill group deleted.");
       await load();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete skill group",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to delete skill group");
     } finally {
       setDeleting(false);
     }
@@ -92,12 +88,6 @@ export default function SkillGroupsAdmin() {
           Create group
         </button>
       </div>
-
-      {error && (
-        <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-          {error}
-        </div>
-      )}
 
       <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
         <table className="min-w-full text-left text-sm">

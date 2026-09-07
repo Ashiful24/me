@@ -1,4 +1,10 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateProfileDto {
   @IsString()
@@ -48,6 +54,10 @@ export class CreateProfileDto {
   @IsString()
   @IsNotEmpty()
   siteDescription: string;
+
+  @IsOptional()
+  @IsBoolean()
+  showTestimonials?: boolean;
 
   @IsArray()
   @IsString({ each: true })

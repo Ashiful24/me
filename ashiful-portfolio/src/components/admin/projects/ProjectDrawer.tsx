@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import { ApiError, apiFetch } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "./ConfirmDialog";
 import FormModal from "./FormModal";
 
@@ -32,14 +33,13 @@ export default function ProjectDrawer({
   userId: string;
   onClose: () => void;
 }) {
+  const toast = useToast();
   const [tags, setTags] = useState<Tag[]>([]);
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [tagForm, setTagForm] = useState<TagFormState | null>(null);
   const [credForm, setCredForm] = useState<CredFormState | null>(null);
-  const [modalError, setModalError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -52,7 +52,6 @@ export default function ProjectDrawer({
   const load = useCallback(async () => {
     if (!project) return;
     setLoading(true);
-    setError(null);
     try {
       const [tagData, credData] = await Promise.all([
         apiFetch<Tag[]>(
@@ -65,13 +64,13 @@ export default function ProjectDrawer({
       setTags(tagData);
       setCredentials(credData);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError ? err.message : "Failed to load project details",
       );
     } finally {
       setLoading(false);
     }
-  }, [project]);
+  }, [project, toast]);
 
   useEffect(() => {
     if (project) void load();
@@ -80,31 +79,28 @@ export default function ProjectDrawer({
       setCredentials([]);
       setTagForm(null);
       setCredForm(null);
-      setModalError(null);
     }
   }, [project, load]);
 
   const closeTagModal = () => {
     setTagForm(null);
-    setModalError(null);
   };
 
   const closeCredModal = () => {
     setCredForm(null);
-    setModalError(null);
   };
 
   const saveTag = async (e: FormEvent) => {
     e.preventDefault();
     if (!project || !tagForm?.name.trim()) return;
     setSaving(true);
-    setModalError(null);
     try {
       if (tagForm.mode === "edit" && tagForm.id) {
         await apiFetch(`/project-tags/${tagForm.id}`, {
           method: "PATCH",
           body: { name: tagForm.name.trim() },
         });
+        toast.success("Tag updated.");
       } else {
         await apiFetch("/project-tags", {
           method: "POST",
@@ -114,11 +110,12 @@ export default function ProjectDrawer({
             name: tagForm.name.trim(),
           },
         });
+        toast.success("Tag created.");
       }
       closeTagModal();
       await load();
     } catch (err) {
-      setModalError(err instanceof Error ? err.message : "Failed to save tag");
+      toast.error(err instanceof Error ? err.message : "Failed to save tag");
     } finally {
       setSaving(false);
     }
@@ -128,7 +125,6 @@ export default function ProjectDrawer({
     e.preventDefault();
     if (!project || !credForm?.label.trim() || !credForm.value.trim()) return;
     setSaving(true);
-    setModalError(null);
     try {
       if (credForm.mode === "edit" && credForm.id) {
         await apiFetch(`/project-credentials/${credForm.id}`, {
@@ -138,6 +134,7 @@ export default function ProjectDrawer({
             value: credForm.value.trim(),
           },
         });
+        toast.success("Credential updated.");
       } else {
         await apiFetch("/project-credentials", {
           method: "POST",
@@ -148,11 +145,12 @@ export default function ProjectDrawer({
             value: credForm.value.trim(),
           },
         });
+        toast.success("Credential created.");
       }
       closeCredModal();
       await load();
     } catch (err) {
-      setModalError(
+      toast.error(
         err instanceof Error ? err.message : "Failed to save credential",
       );
     } finally {
@@ -163,7 +161,6 @@ export default function ProjectDrawer({
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    setError(null);
     try {
       const path =
         deleteTarget.type === "tag"
@@ -171,9 +168,12 @@ export default function ProjectDrawer({
           : `/project-credentials/${deleteTarget.id}`;
       await apiFetch(path, { method: "DELETE" });
       setDeleteTarget(null);
+      toast.success(
+        deleteTarget.type === "tag" ? "Tag deleted." : "Credential deleted.",
+      );
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
+      toast.error(err instanceof Error ? err.message : "Delete failed");
     } finally {
       setDeleting(false);
     }
@@ -203,11 +203,6 @@ export default function ProjectDrawer({
         </div>
 
         <div className="flex-1 space-y-8 overflow-y-auto p-4">
-          {error && (
-            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-              {error}
-            </div>
-          )}
 
           {loading ? (
             <p className="text-sm text-[var(--admin-muted)]">
@@ -221,7 +216,6 @@ export default function ProjectDrawer({
                   <button
                     type="button"
                     onClick={() => {
-                      setModalError(null);
                       setTagForm({ mode: "create", name: "" });
                     }}
                     className="flex items-center gap-1 rounded bg-[var(--admin-btn)] px-3 py-1.5 text-xs text-white hover:bg-[var(--admin-btn-hover)]"
@@ -256,7 +250,6 @@ export default function ProjectDrawer({
                                   type="button"
                                   title="Edit"
                                   onClick={() => {
-                                    setModalError(null);
                                     setTagForm({
                                       mode: "edit",
                                       id: tag.id,
@@ -297,7 +290,6 @@ export default function ProjectDrawer({
                   <button
                     type="button"
                     onClick={() => {
-                      setModalError(null);
                       setCredForm({ mode: "create", label: "", value: "" });
                     }}
                     className="flex items-center gap-1 rounded bg-[var(--admin-btn)] px-3 py-1.5 text-xs text-white hover:bg-[var(--admin-btn-hover)]"
@@ -339,7 +331,6 @@ export default function ProjectDrawer({
                                   type="button"
                                   title="Edit"
                                   onClick={() => {
-                                    setModalError(null);
                                     setCredForm({
                                       mode: "edit",
                                       id: cred.id,
@@ -386,11 +377,6 @@ export default function ProjectDrawer({
         onClose={closeTagModal}
       >
         <form onSubmit={saveTag} className="space-y-4">
-          {modalError && tagForm && (
-            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-              {modalError}
-            </div>
-          )}
           <label className="block text-sm">
             <span className="mb-1 block text-[var(--admin-muted)]">Tag name *</span>
             <input
@@ -438,11 +424,6 @@ export default function ProjectDrawer({
         onClose={closeCredModal}
       >
         <form onSubmit={saveCredential} className="space-y-4">
-          {modalError && credForm && (
-            <div className="rounded border border-[var(--admin-danger)]/40 bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
-              {modalError}
-            </div>
-          )}
           <label className="block text-sm">
             <span className="mb-1 block text-[var(--admin-muted)]">Label *</span>
             <input
